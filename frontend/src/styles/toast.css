@@ -1,0 +1,138 @@
+/* Toast 提示组件样式 */
+
+/* Toast 遮罩层 */
+.toast-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 9998;
+  animation: overlay-fade-in 0.3s ease-out;
+}
+
+@keyframes overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.toast-container {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 320px;
+  max-width: 500px;
+  pointer-events: auto;
+  animation: toast-slide-in 0.3s ease-out;
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+/* 不同类型的 Toast 样式 */
+.toast-success {
+  border-left: 4px solid #52c41a;
+}
+
+.toast-success .toast-icon {
+  color: #52c41a;
+}
+
+.toast-error {
+  border-left: 4px solid #ff4d4f;
+}
+
+.toast-error .toast-icon {
+  color: #ff4d4f;
+}
+
+.toast-warning {
+  border-left: 4px solid #faad14;
+}
+
+.toast-warning .toast-icon {
+  color: #faad14;
+}
+
+.toast-info {
+  border-left: 4px solid #6a5acd;
+}
+
+.toast-info .toast-icon {
+  color: #6a5acd;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .toast {
+    min-width: 280px;
+    max-width: 90vw;
+    padding: 14px 16px;
+  }
+
+  .toast-message {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # 前端服务
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    image: cese/frontend:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - cese-network
+    restart: unless-stopped
+    labels:
+      - "cese.service=frontend"
+
+  # 后端服务
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    image: cese/backend:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../backend:/app
+      - ./logs:/app/logs
+    environment:
+      - GIN_MODE=release
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=123456
+      - DB_NAME=context_engine
+      - DB_PORT=3306
+    depends_on:
+      - mysql
+    networks:
+      - cese-network
+    restart: unless-stopped
+    labels:
+      - "cese.service=backend"
+
+  # MySQL数据库服务
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=context_engine
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cese-network
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    labels:
+      - "cese.service=mysql"
+
+volumes:
+  mysql_data:
+
+networks:
+  cese-network:
+    driver: bridge

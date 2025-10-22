@@ -1,0 +1,139 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+  color: #333;
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 120px;
+}
+
+.btn-primary {
+  background-color: #6a5acd;
+  color: white;
+  box-shadow: 0 2px 8px rgba(106, 90, 205, 0.3);
+}
+
+.btn-primary:hover {
+  background-color: #5a4ab8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 90, 205, 0.4);
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  color: #6a5acd;
+  border: 1px solid #6a5acd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.form-input.error {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 16px;
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Placeholder 支持多行显示 */
+.textarea::placeholder,
+.textarea::-webkit-input-placeholder {
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+.textarea::-moz-placeholder {
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+.textarea:-ms-input-placeholder {
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.textarea.error {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+.error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 5px;
+}

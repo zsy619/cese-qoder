@@ -1,0 +1,22 @@
+# 使用最新版本的MySQL官方镜像作为基础镜像
+FROM mysql:latest
+
+# 设置环境变量
+ENV MYSQL_ROOT_PASSWORD=123456
+ENV MYSQL_DATABASE=context_engine
+
+# 复制初始化SQL脚本
+COPY init.sql /docker-entrypoint-initdb.d/
+
+# 设置配置文件
+COPY my.cnf /etc/mysql/conf.d/my.cnf
+
+# 设置健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD
+
+# 暴露MySQL默认端口
+EXPOSE 3306
+
+# 启动MySQL服务
+CMD ["mysqld"]
