@@ -46,6 +46,17 @@ func RegisterRoutes(h *server.Hertz) {
 		template.DELETE("/:id", handlers.DeleteTemplateHandler)
 	}
 
+	// ===== API Provider路由（全部需要认证）=====
+	apiProvider := v1.Group("/api-provider")
+	apiProvider.Use(middleware.AuthMiddleware())
+	{
+		apiProvider.POST("", handlers.CreateAPIProviderHandler)
+		apiProvider.GET("", handlers.ListAPIProvidersHandler)
+		apiProvider.GET("/:id", handlers.GetAPIProviderHandler)
+		apiProvider.PUT("/:id", handlers.UpdateAPIProviderHandler)
+		apiProvider.DELETE("/:id", handlers.DeleteAPIProviderHandler)
+	}
+
 	// 健康检查接口
 	h.GET("/health", func(ctx context.Context, c *app.RequestContext) {
 		c.JSON(200, map[string]string{

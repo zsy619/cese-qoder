@@ -1,11 +1,7 @@
-.qoder
 node_modules
 go.sum
 logs
 bin
-
-# 配置文件（包含敏感信息）
-backend/config/config.yaml
 
 # IDE
 .vscode

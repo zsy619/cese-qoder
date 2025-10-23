@@ -1,0 +1,32 @@
+# CESE-Qoder 后端配置文件
+
+# 服务器配置
+server:
+  host: "0.0.0.0"           # 监听地址，0.0.0.0 表示监听所有网卡
+  port: 8080                # 监听端口
+  mode: "debug"             # 运行模式: debug | release
+
+# 数据库配置
+database:
+  host: "localhost"         # 数据库主机地址
+  port: 3306                # 数据库端口
+  user: "root"              # 数据库用户名
+  password: "123456"        # 数据库密码
+  dbname: "context_engine"  # 数据库名称
+  charset: "utf8mb4"        # 字符集
+  max_idle_conns: 10        # 最大空闲连接数
+  max_open_conns: 100       # 最大打开连接数
+  conn_max_lifetime: 3600   # 连接最大生命周期（秒）
+
+# JWT 配置
+jwt:
+  secret: "cese-qoder-secret-key-change-in-production"  # JWT 密钥（生产环境必须修改）
+  expire_hour: 24                                        # Token 过期时间（小时）
+
+# 日志配置
+log:
+  level: "debug"                # 日志级别: debug | info | warn | error
+  file_path: "logs/app.log"     # 日志文件路径
+  max_size: 100                 # 单个日志文件最大大小（MB）
+  max_backups: 7                # 保留的旧日志文件最大数量
+  max_age: 30                   # 保留旧日志文件的最大天数（天）

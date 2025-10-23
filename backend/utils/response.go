@@ -31,6 +31,7 @@ const (
 	CodeForbidden        = 403  // 无权限
 	CodeNotFound         = 404  // 资源不存在
 	CodeInternalError    = 500  // 服务器内部错误
+	CodeServerError      = 500  // 服务器错误（别名）
 	CodeDatabaseError    = 501  // 数据库错误
 	CodePhoneExists      = 1001 // 手机号已存在
 	CodePhoneNotFound    = 1002 // 手机号不存在

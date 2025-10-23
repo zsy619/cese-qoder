@@ -140,3 +140,12 @@ func (s *UserService) GetUserInfo(phone string) (*models.User, error) {
 
 	return &user, nil
 }
+
+// GetUserByPhone 根据手机号获取用户（供其他服务调用）
+func GetUserByPhone(phone string) (*models.User, error) {
+	var user models.User
+	if err := config.DB.Where("phone = ?", phone).First(&user).Error; err != nil {
+		return nil, errors.New("用户不存在")
+	}
+	return &user, nil
+}
