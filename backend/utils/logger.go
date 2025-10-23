@@ -3,14 +3,31 @@ package utils
 import (
 	"os"
 
+	"github.com/zsy619/cese-qoder/backend/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var Logger *zap.Logger
 
 // InitLogger 初始化日志
 func InitLogger() error {
+	// 使用默认配置
+	cfg := config.GetConfig()
+	return InitLoggerWithConfig(&cfg.Log)
+}
+
+// InitLoggerWithConfig 使用指定配置初始化日志
+func InitLoggerWithConfig(cfg *config.LogConfig) error {
+	// 确保日志目录存在
+	if err := os.MkdirAll("logs", 0755); err != nil {
+		return err
+	}
+
+	// 解析日志级别
+	level := parseLogLevel(cfg.Level)
+
 	// 配置编码器
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
@@ -26,27 +43,44 @@ func InitLogger() error {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
-	// 设置日志级别
-	atom := zap.NewAtomicLevelAt(zap.DebugLevel)
-
-	// 配置日志输出
-	config := zap.Config{
-		Level:            atom,
-		Development:      true,
-		Encoding:         "json",
-		EncoderConfig:    encoderConfig,
-		OutputPaths:      []string{"stdout", "logs/app.log"},
-		ErrorOutputPaths: []string{"stderr", "logs/error.log"},
+	// 配置日志轮转
+	fileWriter := &lumberjack.Logger{
+		Filename:   cfg.FilePath,
+		MaxSize:    cfg.MaxSize,    // MB
+		MaxBackups: cfg.MaxBackups, // 保留的旧文件数量
+		MaxAge:     cfg.MaxAge,     // 保留天数
+		Compress:   true,           // 压缩旧文件
 	}
+
+	// 创建多输出writer（控制台 + 文件）
+	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
+	fileEncoder := zapcore.NewJSONEncoder(encoderConfig)
+
+	core := zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), level),
+		zapcore.NewCore(fileEncoder, zapcore.AddSync(fileWriter), level),
+	)
 
 	// 创建日志实例
-	var err error
-	Logger, err = config.Build()
-	if err != nil {
-		return err
-	}
+	Logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
 	return nil
+}
+
+// parseLogLevel 解析日志级别
+func parseLogLevel(levelStr string) zapcore.Level {
+	switch levelStr {
+	case "debug":
+		return zap.DebugLevel
+	case "info":
+		return zap.InfoLevel
+	case "warn":
+		return zap.WarnLevel
+	case "error":
+		return zap.ErrorLevel
+	default:
+		return zap.InfoLevel
+	}
 }
 
 // Debug 调试日志

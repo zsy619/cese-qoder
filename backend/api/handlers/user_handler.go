@@ -15,7 +15,7 @@ var userService = &services.UserService{}
 func RegisterHandler(ctx context.Context, c *app.RequestContext) {
 	var req services.RegisterRequest
 	if err := c.BindAndValidate(&req); err != nil {
-		utils.Error(&ctx, c, utils.CodeInvalidParams, "参数错误: "+err.Error())
+		utils.ResponseError(&ctx, c, utils.CodeInvalidParams, "参数错误: "+err.Error())
 		return
 	}
 
@@ -30,7 +30,7 @@ func RegisterHandler(ctx context.Context, c *app.RequestContext) {
 		} else if err.Error() == "密码强度不足：需要8-16位，包含大小写字母、数字和特殊字符" {
 			code = utils.CodePasswordWeak
 		}
-		utils.Error(&ctx, c, code, err.Error())
+		utils.ResponseError(&ctx, c, code, err.Error())
 		return
 	}
 
@@ -42,7 +42,7 @@ func RegisterHandler(ctx context.Context, c *app.RequestContext) {
 func LoginHandler(ctx context.Context, c *app.RequestContext) {
 	var req services.LoginRequest
 	if err := c.BindAndValidate(&req); err != nil {
-		utils.Error(&ctx, c, utils.CodeInvalidParams, "参数错误: "+err.Error())
+		utils.ResponseError(&ctx, c, utils.CodeInvalidParams, "参数错误: "+err.Error())
 		return
 	}
 
@@ -57,7 +57,7 @@ func LoginHandler(ctx context.Context, c *app.RequestContext) {
 		} else if err.Error() == "密码错误" {
 			code = utils.CodePasswordError
 		}
-		utils.Error(&ctx, c, code, err.Error())
+		utils.ResponseError(&ctx, c, code, err.Error())
 		return
 	}
 
@@ -72,20 +72,20 @@ func LoginHandler(ctx context.Context, c *app.RequestContext) {
 func ChangePasswordHandler(ctx context.Context, c *app.RequestContext) {
 	var req services.ChangePasswordRequest
 	if err := c.BindAndValidate(&req); err != nil {
-		utils.Error(&ctx, c, utils.CodeInvalidParams, "参数错误: "+err.Error())
+		utils.ResponseError(&ctx, c, utils.CodeInvalidParams, "参数错误: "+err.Error())
 		return
 	}
 
 	// 从上下文获取用户信息
 	userPhone, exists := c.Get("userPhone")
 	if !exists {
-		utils.Error(&ctx, c, utils.CodeUnauthorized, "未认证")
+		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
 	// 验证是否为本人操作
 	if userPhone.(string) != req.Phone {
-		utils.Error(&ctx, c, utils.CodeForbidden, "无权修改他人密码")
+		utils.ResponseError(&ctx, c, utils.CodeForbidden, "无权修改他人密码")
 		return
 	}
 
@@ -99,7 +99,7 @@ func ChangePasswordHandler(ctx context.Context, c *app.RequestContext) {
 		} else if err.Error() == "新密码强度不足：需要8-16位，包含大小写字母、数字和特殊字符" {
 			code = utils.CodePasswordWeak
 		}
-		utils.Error(&ctx, c, code, err.Error())
+		utils.ResponseError(&ctx, c, code, err.Error())
 		return
 	}
 
@@ -112,13 +112,13 @@ func GetUserInfoHandler(ctx context.Context, c *app.RequestContext) {
 	// 从上下文获取用户信息
 	userPhone, exists := c.Get("userPhone")
 	if !exists {
-		utils.Error(&ctx, c, utils.CodeUnauthorized, "未认证")
+		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
 	user, err := userService.GetUserInfo(userPhone.(string))
 	if err != nil {
-		utils.Error(&ctx, c, utils.CodeNotFound, err.Error())
+		utils.ResponseError(&ctx, c, utils.CodeNotFound, err.Error())
 		return
 	}
 

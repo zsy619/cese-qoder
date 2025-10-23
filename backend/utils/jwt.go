@@ -5,15 +5,32 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/zsy619/cese-qoder/backend/config"
 )
 
 // JWT 配置
 var (
-	// JWTSecret JWT 密钥（生产环境应从配置文件读取）
-	JWTSecret = []byte("cese-qoder-secret-key-change-in-production")
-	// JWTExpireDuration Token 过期时间（24小时）
-	JWTExpireDuration = time.Hour * 24
+	// JWTSecret JWT 密钥（从配置文件读取）
+	JWTSecret []byte
+	// JWTExpireDuration Token 过期时间
+	JWTExpireDuration time.Duration
 )
+
+// InitJWT 初始化 JWT 配置
+func InitJWT(cfg *config.JWTConfig) {
+	JWTSecret = []byte(cfg.Secret)
+	JWTExpireDuration = time.Hour * time.Duration(cfg.ExpireHour)
+}
+
+// getJWTConfig 获取 JWT 配置（如果未初始化则使用默认值）
+func getJWTConfig() ([]byte, time.Duration) {
+	if len(JWTSecret) == 0 {
+		// 使用默认配置
+		cfg := config.GetConfig()
+		return []byte(cfg.JWT.Secret), time.Hour * time.Duration(cfg.JWT.ExpireHour)
+	}
+	return JWTSecret, JWTExpireDuration
+}
 
 // Claims JWT 声明结构体
 type Claims struct {
@@ -23,10 +40,12 @@ type Claims struct {
 
 // GenerateToken 生成 JWT Token
 func GenerateToken(phone string) (string, error) {
+	secret, expireDuration := getJWTConfig()
+
 	claims := &Claims{
 		UserID: phone,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(JWTExpireDuration)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expireDuration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "cese-qoder",
@@ -34,13 +53,15 @@ func GenerateToken(phone string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(JWTSecret)
+	return token.SignedString(secret)
 }
 
 // ParseToken 解析 JWT Token
 func ParseToken(tokenString string) (*Claims, error) {
+	secret, _ := getJWTConfig()
+
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return JWTSecret, nil
+		return secret, nil
 	})
 
 	if err != nil {

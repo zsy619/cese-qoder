@@ -61,8 +61,8 @@ func SuccessWithMessage(c *context.Context, ctx *app.RequestContext, message str
 	})
 }
 
-// Error 错误响应
-func Error(c *context.Context, ctx *app.RequestContext, code int, message string) {
+// ResponseError 错误响应
+func ResponseError(c *context.Context, ctx *app.RequestContext, code int, message string) {
 	ctx.JSON(consts.StatusOK, Response{
 		Code:    code,
 		Message: message,

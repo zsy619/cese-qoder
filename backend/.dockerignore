@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+README.md
+
+# Tests
+*_test.go
+tests/
+coverage.txt
+coverage.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local

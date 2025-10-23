@@ -1,5 +1,11 @@
 package config
 
+import (
+	"os"
+
+	"gopkg.in/yaml.v3"
+)
+
 // AppConfig 应用配置
 type AppConfig struct {
 	Server ServerConfig `yaml:"server"`
@@ -30,6 +36,36 @@ type LogConfig struct {
 	MaxAge     int    `yaml:"max_age"` // days
 }
 
+var globalConfig *AppConfig
+
+// LoadConfig 从 YAML 文件加载配置
+func LoadConfig(configPath string) (*AppConfig, error) {
+	// 读取配置文件
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// 解析 YAML
+	var config AppConfig
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, err
+	}
+
+	// 设置全局配置
+	globalConfig = &config
+
+	return &config, nil
+}
+
+// GetConfig 获取全局配置
+func GetConfig() *AppConfig {
+	if globalConfig == nil {
+		return GetDefaultConfig()
+	}
+	return globalConfig
+}
+
 // GetDefaultConfig 获取默认配置
 func GetDefaultConfig() *AppConfig {
 	return &AppConfig{
@@ -39,12 +75,15 @@ func GetDefaultConfig() *AppConfig {
 			Mode: "debug",
 		},
 		DB: DBConfig{
-			Host:     "localhost",
-			Port:     3306,
-			User:     "root",
-			Password: "123456",
-			DBName:   "context_engine",
-			Charset:  "utf8mb4",
+			Host:            "localhost",
+			Port:            3306,
+			User:            "root",
+			Password:        "123456",
+			DBName:          "context_engine",
+			Charset:         "utf8mb4",
+			MaxIdleConns:    10,
+			MaxOpenConns:    100,
+			ConnMaxLifetime: 3600,
 		},
 		JWT: JWTConfig{
 			Secret:     "cese-qoder-secret-key-change-in-production",

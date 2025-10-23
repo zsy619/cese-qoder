@@ -10,7 +10,7 @@ import (
 func CORSMiddleware() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		// 允许的源
-		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Header("Access-Control-Allow-Origin", "*")
 		// 允许的方法
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		// 允许的头

@@ -24,25 +24,45 @@ func main() {
 	utils.Info("Starting CESE-Qoder Backend Service...")
 
 	// 2. 加载配置
-	appConfig := config.GetDefaultConfig()
+	var appConfig *config.AppConfig
+	configPath := "config/config.yaml"
+
+	// 尝试从配置文件加载
+	if _, err := os.Stat(configPath); err == nil {
+		appConfig, err = config.LoadConfig(configPath)
+		if err != nil {
+			utils.Warn("Failed to load config file, using default config", zap.Error(err))
+			appConfig = config.GetDefaultConfig()
+		} else {
+			utils.Info("Configuration loaded from file", zap.String("path", configPath))
+		}
+	} else {
+		utils.Info("Config file not found, using default config")
+		appConfig = config.GetDefaultConfig()
+	}
+
 	utils.Info("Configuration loaded", zap.Any("config", appConfig))
 
-	// 3. 初始化数据库连接
+	// 3. 初始化 JWT 配置
+	utils.InitJWT(&appConfig.JWT)
+	utils.Info("JWT configuration initialized")
+
+	// 4. 初始化数据库连接
 	if err := config.InitDB(&appConfig.DB); err != nil {
 		utils.Fatal("Failed to connect to database", zap.Error(err))
 	}
 	utils.Info("Database connected successfully")
 
-	// 4. 创建 Hertz 服务器实例
+	// 5. 创建 Hertz 服务器实例
 	h := server.Default(
 		server.WithHostPorts(fmt.Sprintf("%s:%d", appConfig.Server.Host, appConfig.Server.Port)),
 	)
 
-	// 5. 注册路由
+	// 6. 注册路由
 	routes.RegisterRoutes(h)
 	utils.Info("Routes registered")
 
-	// 6. 设置优雅关闭
+	// 7. 设置优雅关闭
 	go func() {
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -59,7 +79,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	// 7. 启动服务器
+	// 8. 启动服务器
 	utils.Info("Server started",
 		zap.String("host", appConfig.Server.Host),
 		zap.Int("port", appConfig.Server.Port),
