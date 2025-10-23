@@ -26,12 +26,12 @@ func TestCreateAPIProvider(t *testing.T) {
 	setupAPIProviderTest(t)
 
 	// 创建测试用户
-	testPhone := "13900139001"
+	testMobile := "13900139001"
 	testPassword := "Test@123456"
 
 	hashedPassword, _ := utils.HashPassword(testPassword)
 	user := &models.User{
-		Phone:    testPhone,
+		Mobile:   testMobile,
 		Password: hashedPassword,
 	}
 
@@ -49,7 +49,7 @@ func TestCreateAPIProvider(t *testing.T) {
 		APIRemark: "测试Provider",
 	}
 
-	provider, err := CreateAPIProvider(testPhone, req)
+	provider, err := CreateAPIProvider(testMobile, req)
 	if err != nil {
 		t.Fatalf("CreateAPIProvider() error = %v", err)
 	}
@@ -74,12 +74,12 @@ func TestListAPIProviders(t *testing.T) {
 	setupAPIProviderTest(t)
 
 	// 创建测试用户
-	testPhone := "13900139002"
+	testMobile := "13900139002"
 	testPassword := "Test@123456"
 
 	hashedPassword, _ := utils.HashPassword(testPassword)
 	user := &models.User{
-		Phone:    testPhone,
+		Mobile:   testMobile,
 		Password: hashedPassword,
 	}
 
@@ -107,7 +107,7 @@ func TestListAPIProviders(t *testing.T) {
 
 	createdProviders := make([]*models.APIProvider, 0)
 	for _, req := range providers {
-		p, err := CreateAPIProvider(testPhone, &req)
+		p, err := CreateAPIProvider(testMobile, &req)
 		if err != nil {
 			t.Fatalf("CreateAPIProvider() error = %v", err)
 		}
@@ -122,7 +122,7 @@ func TestListAPIProviders(t *testing.T) {
 	}()
 
 	// 测试获取所有Provider
-	list, err := ListAPIProviders(testPhone, "", nil)
+	list, err := ListAPIProviders(testMobile, "", nil)
 	if err != nil {
 		t.Fatalf("ListAPIProviders() error = %v", err)
 	}
@@ -132,7 +132,7 @@ func TestListAPIProviders(t *testing.T) {
 	}
 
 	// 测试按类型过滤
-	list, err = ListAPIProviders(testPhone, "deepseek", nil)
+	list, err = ListAPIProviders(testMobile, "deepseek", nil)
 	if err != nil {
 		t.Fatalf("ListAPIProviders() with type filter error = %v", err)
 	}
@@ -146,12 +146,12 @@ func TestUpdateAPIProvider(t *testing.T) {
 	setupAPIProviderTest(t)
 
 	// 创建测试用户和Provider
-	testPhone := "13900139003"
+	testMobile := "13900139003"
 	testPassword := "Test@123456"
 
 	hashedPassword, _ := utils.HashPassword(testPassword)
 	user := &models.User{
-		Phone:    testPhone,
+		Mobile:   testMobile,
 		Password: hashedPassword,
 	}
 
@@ -168,7 +168,7 @@ func TestUpdateAPIProvider(t *testing.T) {
 		APIModel: "gpt-3.5",
 	}
 
-	provider, err := CreateAPIProvider(testPhone, createReq)
+	provider, err := CreateAPIProvider(testMobile, createReq)
 	if err != nil {
 		t.Fatalf("CreateAPIProvider() error = %v", err)
 	}
@@ -180,13 +180,13 @@ func TestUpdateAPIProvider(t *testing.T) {
 		APIModel: "gpt-4",
 	}
 
-	err = UpdateAPIProvider(testPhone, provider.ID, updateReq)
+	err = UpdateAPIProvider(testMobile, provider.ID, updateReq)
 	if err != nil {
 		t.Fatalf("UpdateAPIProvider() error = %v", err)
 	}
 
 	// 验证更新
-	updated, err := GetAPIProvider(testPhone, provider.ID)
+	updated, err := GetAPIProvider(testMobile, provider.ID)
 	if err != nil {
 		t.Fatalf("GetAPIProvider() after update error = %v", err)
 	}
@@ -204,12 +204,12 @@ func TestDeleteAPIProvider(t *testing.T) {
 	setupAPIProviderTest(t)
 
 	// 创建测试用户和Provider
-	testPhone := "13900139004"
+	testMobile := "13900139004"
 	testPassword := "Test@123456"
 
 	hashedPassword, _ := utils.HashPassword(testPassword)
 	user := &models.User{
-		Phone:    testPhone,
+		Mobile:   testMobile,
 		Password: hashedPassword,
 	}
 
@@ -226,7 +226,7 @@ func TestDeleteAPIProvider(t *testing.T) {
 		APIModel: "gpt-3.5",
 	}
 
-	provider, err := CreateAPIProvider(testPhone, createReq)
+	provider, err := CreateAPIProvider(testMobile, createReq)
 	if err != nil {
 		t.Fatalf("CreateAPIProvider() error = %v", err)
 	}
@@ -234,13 +234,13 @@ func TestDeleteAPIProvider(t *testing.T) {
 	providerID := provider.ID
 
 	// 测试删除
-	err = DeleteAPIProvider(testPhone, providerID)
+	err = DeleteAPIProvider(testMobile, providerID)
 	if err != nil {
 		t.Fatalf("DeleteAPIProvider() error = %v", err)
 	}
 
 	// 验证已删除
-	_, err = GetAPIProvider(testPhone, providerID)
+	_, err = GetAPIProvider(testMobile, providerID)
 	if err == nil {
 		t.Error("GetAPIProvider() after delete should return error")
 	}
@@ -250,12 +250,12 @@ func TestEncryptionDecryption(t *testing.T) {
 	setupAPIProviderTest(t)
 
 	// 创建测试用户和Provider
-	testPhone := "13900139005"
+	testMobile := "13900139005"
 	testPassword := "Test@123456"
 
 	hashedPassword, _ := utils.HashPassword(testPassword)
 	user := &models.User{
-		Phone:    testPhone,
+		Mobile:   testMobile,
 		Password: hashedPassword,
 	}
 
@@ -276,7 +276,7 @@ func TestEncryptionDecryption(t *testing.T) {
 		APIModel:  "gpt-4",
 	}
 
-	provider, err := CreateAPIProvider(testPhone, createReq)
+	provider, err := CreateAPIProvider(testMobile, createReq)
 	if err != nil {
 		t.Fatalf("CreateAPIProvider() error = %v", err)
 	}

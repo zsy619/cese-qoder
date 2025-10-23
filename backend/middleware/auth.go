@@ -49,7 +49,7 @@ func AuthMiddleware() app.HandlerFunc {
 		}
 
 		// 将用户信息存入上下文
-		c.Set("userPhone", claims.Mobile)
+		c.Set("userMobile", claims.Mobile)
 
 		c.Next(ctx)
 	}

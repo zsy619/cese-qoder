@@ -46,14 +46,14 @@ func CreateAPIProviderHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未授权")
 		return
 	}
 
 	// 创建Provider
-	provider, err := services.CreateAPIProvider(userPhone.(string), &req)
+	provider, err := services.CreateAPIProvider(userMobile.(string), &req)
 	if err != nil {
 		utils.Error("Failed to create API Provider", zap.Error(err))
 		utils.ResponseError(&ctx, c, utils.CodeServerError, "创建失败")
@@ -74,14 +74,14 @@ func GetAPIProviderHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未授权")
 		return
 	}
 
 	// 获取Provider
-	provider, err := services.GetAPIProvider(userPhone.(string), uint(providerID))
+	provider, err := services.GetAPIProvider(userMobile.(string), uint(providerID))
 	if err != nil {
 		utils.ResponseError(&ctx, c, utils.CodeNotFound, "Provider不存在")
 		return
@@ -106,14 +106,14 @@ func ListAPIProvidersHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未授权")
 		return
 	}
 
 	// 获取Provider列表
-	providers, err := services.ListAPIProviders(userPhone.(string), apiType, status)
+	providers, err := services.ListAPIProviders(userMobile.(string), apiType, status)
 	if err != nil {
 		utils.Error("Failed to list API Providers", zap.Error(err))
 		utils.ResponseError(&ctx, c, utils.CodeServerError, "查询失败")
@@ -150,14 +150,14 @@ func UpdateAPIProviderHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未授权")
 		return
 	}
 
 	// 更新Provider
-	if err := services.UpdateAPIProvider(userPhone.(string), uint(providerID), &req); err != nil {
+	if err := services.UpdateAPIProvider(userMobile.(string), uint(providerID), &req); err != nil {
 		utils.Error("Failed to update API Provider", zap.Error(err))
 		utils.ResponseError(&ctx, c, utils.CodeServerError, "更新失败")
 		return
@@ -177,14 +177,14 @@ func DeleteAPIProviderHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未授权")
 		return
 	}
 
 	// 删除Provider
-	if err := services.DeleteAPIProvider(userPhone.(string), uint(providerID)); err != nil {
+	if err := services.DeleteAPIProvider(userMobile.(string), uint(providerID)); err != nil {
 		utils.Error("Failed to delete API Provider", zap.Error(err))
 		utils.ResponseError(&ctx, c, utils.CodeServerError, "删除失败")
 		return

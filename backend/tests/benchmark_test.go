@@ -14,7 +14,7 @@ func BenchmarkUserRegister(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		req := &services.RegisterRequest{
-			Phone:    "13900139000",
+			Mobile:   "13900139000",
 			Password: "Test@123456",
 		}
 		userService.Register(req)
@@ -27,7 +27,7 @@ func BenchmarkUserLogin(b *testing.B) {
 
 	// 预先注册用户
 	req := &services.RegisterRequest{
-		Phone:    "13900139001",
+		Mobile:   "13900139001",
 		Password: "Test@123456",
 	}
 	userService.Register(req)
@@ -35,7 +35,7 @@ func BenchmarkUserLogin(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		loginReq := &services.LoginRequest{
-			Phone:    "13900139001",
+			Mobile:   "13900139001",
 			Password: "Test@123456",
 		}
 		userService.Login(loginReq)

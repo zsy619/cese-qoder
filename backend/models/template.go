@@ -7,7 +7,7 @@ import (
 // Template 六要素模板模型
 type Template struct {
 	ID             uint64    `gorm:"primaryKey;autoIncrement" json:"id"`
-	UserID         uint64    `gorm:"not null;index" json:"user_id"`
+	Mobile         string    `gorm:"type:varchar(32);not null;index" json:"mobile"`
 	Topic          string    `gorm:"type:varchar(255);not null;index" json:"topic"`
 	TaskObjective  string    `gorm:"type:text" json:"task_objective"`
 	AIRole         string    `gorm:"type:text" json:"ai_role"`

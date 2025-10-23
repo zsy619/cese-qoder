@@ -7,7 +7,7 @@ import (
 // APIProvider API Provider配置模型
 type APIProvider struct {
 	ID         uint      `json:"id" gorm:"primaryKey;autoIncrement"`
-	UserID     uint64    `json:"user_id" gorm:"not null;index"`
+	Mobile     string    `json:"mobile" gorm:"type:varchar(32);not null;index"`
 	Name       string    `json:"name" gorm:"type:varchar(100);not null"`
 	APIKey     string    `json:"api_key" gorm:"type:varchar(255);not null"`
 	APISecret  string    `json:"api_secret,omitempty" gorm:"type:varchar(255)"`
@@ -16,6 +16,7 @@ type APIProvider struct {
 	APIModel   string    `json:"api_model" gorm:"type:varchar(100);not null"`
 	APIVersion string    `json:"api_version" gorm:"type:varchar(20);default:'v1'"`
 	APIStatus  int8      `json:"api_status" gorm:"type:tinyint(1);default:1;index"`
+	APIOpen    int       `json:"api_open" gorm:"type:int;default:0;index"`
 	APIRemark  string    `json:"api_remark,omitempty" gorm:"type:text"`
 	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt  time.Time `json:"updated_at" gorm:"autoUpdateTime"`
@@ -35,6 +36,7 @@ type APIProviderCreateRequest struct {
 	APIType    string `json:"api_type" binding:"required"`
 	APIModel   string `json:"api_model" binding:"required"`
 	APIVersion string `json:"api_version"`
+	APIOpen    int    `json:"api_open"`
 	APIRemark  string `json:"api_remark"`
 }
 
@@ -48,13 +50,14 @@ type APIProviderUpdateRequest struct {
 	APIModel   string `json:"api_model"`
 	APIVersion string `json:"api_version"`
 	APIStatus  *int8  `json:"api_status"`
+	APIOpen    *int   `json:"api_open"`
 	APIRemark  string `json:"api_remark"`
 }
 
 // APIProviderResponse API Provider响应（隐藏敏感信息）
 type APIProviderResponse struct {
 	ID         uint      `json:"id"`
-	UserID     uint64    `json:"user_id"`
+	Mobile     string    `json:"mobile"`
 	Name       string    `json:"name"`
 	APIKeyMask string    `json:"api_key_mask"` // 脱敏后的密钥
 	APIURL     string    `json:"api_url"`
@@ -62,6 +65,7 @@ type APIProviderResponse struct {
 	APIModel   string    `json:"api_model"`
 	APIVersion string    `json:"api_version"`
 	APIStatus  int8      `json:"api_status"`
+	APIOpen    int       `json:"api_open"`
 	APIRemark  string    `json:"api_remark,omitempty"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
@@ -71,7 +75,7 @@ type APIProviderResponse struct {
 func (p *APIProvider) ToResponse() *APIProviderResponse {
 	return &APIProviderResponse{
 		ID:         p.ID,
-		UserID:     p.UserID,
+		Mobile:     p.Mobile,
 		Name:       p.Name,
 		APIKeyMask: maskAPIKey(p.APIKey),
 		APIURL:     p.APIURL,
@@ -79,6 +83,7 @@ func (p *APIProvider) ToResponse() *APIProviderResponse {
 		APIModel:   p.APIModel,
 		APIVersion: p.APIVersion,
 		APIStatus:  p.APIStatus,
+		APIOpen:    p.APIOpen,
 		APIRemark:  p.APIRemark,
 		CreatedAt:  p.CreatedAt,
 		UpdatedAt:  p.UpdatedAt,

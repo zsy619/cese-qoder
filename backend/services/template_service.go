@@ -37,16 +37,15 @@ type TemplateQueryRequest struct {
 }
 
 // CreateTemplate 创建模板
-func (s *TemplateService) CreateTemplate(userPhone string, req *TemplateRequest) (*models.Template, error) {
-	// 获取用户 ID
-	var user models.User
-	if err := config.DB.Where("phone = ?", userPhone).First(&user).Error; err != nil {
-		return nil, errors.New("用户不存在")
+func (s *TemplateService) CreateTemplate(userMobile string, req *TemplateRequest) (*models.Template, error) {
+	// 验证用户存在
+	if _, err := GetUserByMobile(userMobile); err != nil {
+		return nil, err
 	}
 
 	// 创建模板
 	template := &models.Template{
-		UserID:         user.ID,
+		Mobile:         userMobile,
 		Topic:          req.Topic,
 		TaskObjective:  req.TaskObjective,
 		AIRole:         req.AIRole,
@@ -64,11 +63,10 @@ func (s *TemplateService) CreateTemplate(userPhone string, req *TemplateRequest)
 }
 
 // GetTemplates 查询模板列表（支持多条件查询和分页）
-func (s *TemplateService) GetTemplates(userPhone string, req *TemplateQueryRequest) ([]models.Template, int64, error) {
-	// 获取用户 ID
-	var user models.User
-	if err := config.DB.Where("phone = ?", userPhone).First(&user).Error; err != nil {
-		return nil, 0, errors.New("用户不存在")
+func (s *TemplateService) GetTemplates(userMobile string, req *TemplateQueryRequest) ([]models.Template, int64, error) {
+	// 验证用户存在
+	if _, err := GetUserByMobile(userMobile); err != nil {
+		return nil, 0, err
 	}
 
 	// 设置默认分页参数
@@ -83,7 +81,7 @@ func (s *TemplateService) GetTemplates(userPhone string, req *TemplateQueryReque
 	}
 
 	// 构建查询
-	query := config.DB.Model(&models.Template{}).Where("user_id = ?", user.ID)
+	query := config.DB.Model(&models.Template{}).Where("mobile = ?", userMobile)
 
 	// 添加模糊查询条件
 	if req.Topic != "" {
@@ -125,16 +123,15 @@ func (s *TemplateService) GetTemplates(userPhone string, req *TemplateQueryReque
 }
 
 // GetTemplateByID 获取模板详情
-func (s *TemplateService) GetTemplateByID(userPhone string, templateID uint64) (*models.Template, error) {
-	// 获取用户 ID
-	var user models.User
-	if err := config.DB.Where("phone = ?", userPhone).First(&user).Error; err != nil {
-		return nil, errors.New("用户不存在")
+func (s *TemplateService) GetTemplateByID(userMobile string, templateID uint64) (*models.Template, error) {
+	// 验证用户存在
+	if _, err := GetUserByMobile(userMobile); err != nil {
+		return nil, err
 	}
 
 	// 查询模板
 	var template models.Template
-	if err := config.DB.Where("id = ? AND user_id = ?", templateID, user.ID).First(&template).Error; err != nil {
+	if err := config.DB.Where("id = ? AND mobile = ?", templateID, userMobile).First(&template).Error; err != nil {
 		return nil, errors.New("模板不存在或无权访问")
 	}
 
@@ -142,16 +139,15 @@ func (s *TemplateService) GetTemplateByID(userPhone string, templateID uint64) (
 }
 
 // UpdateTemplate 更新模板
-func (s *TemplateService) UpdateTemplate(userPhone string, templateID uint64, req *TemplateRequest) (*models.Template, error) {
-	// 获取用户 ID
-	var user models.User
-	if err := config.DB.Where("phone = ?", userPhone).First(&user).Error; err != nil {
-		return nil, errors.New("用户不存在")
+func (s *TemplateService) UpdateTemplate(userMobile string, templateID uint64, req *TemplateRequest) (*models.Template, error) {
+	// 验证用户存在
+	if _, err := GetUserByMobile(userMobile); err != nil {
+		return nil, err
 	}
 
 	// 查询模板
 	var template models.Template
-	if err := config.DB.Where("id = ? AND user_id = ?", templateID, user.ID).First(&template).Error; err != nil {
+	if err := config.DB.Where("id = ? AND mobile = ?", templateID, userMobile).First(&template).Error; err != nil {
 		return nil, errors.New("模板不存在或无权操作")
 	}
 
@@ -172,16 +168,15 @@ func (s *TemplateService) UpdateTemplate(userPhone string, templateID uint64, re
 }
 
 // DeleteTemplate 删除模板
-func (s *TemplateService) DeleteTemplate(userPhone string, templateID uint64) error {
-	// 获取用户 ID
-	var user models.User
-	if err := config.DB.Where("phone = ?", userPhone).First(&user).Error; err != nil {
-		return errors.New("用户不存在")
+func (s *TemplateService) DeleteTemplate(userMobile string, templateID uint64) error {
+	// 验证用户存在
+	if _, err := GetUserByMobile(userMobile); err != nil {
+		return err
 	}
 
 	// 查询模板
 	var template models.Template
-	if err := config.DB.Where("id = ? AND user_id = ?", templateID, user.ID).First(&template).Error; err != nil {
+	if err := config.DB.Where("id = ? AND mobile = ?", templateID, userMobile).First(&template).Error; err != nil {
 		return errors.New("模板不存在或无权操作")
 	}
 

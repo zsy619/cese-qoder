@@ -46,7 +46,7 @@ func TestUserWorkflow(t *testing.T) {
 
 	t.Run("1.用户注册", func(t *testing.T) {
 		reqBody := map[string]string{
-			"phone":    testPhone,
+			"mobile":   testPhone,
 			"password": testPassword,
 		}
 		body, _ := json.Marshal(reqBody)
@@ -70,7 +70,7 @@ func TestUserWorkflow(t *testing.T) {
 
 	t.Run("2.用户登录", func(t *testing.T) {
 		reqBody := map[string]string{
-			"phone":    testPhone,
+			"mobile":   testPhone,
 			"password": testPassword,
 		}
 		body, _ := json.Marshal(reqBody)
@@ -84,17 +84,20 @@ func TestUserWorkflow(t *testing.T) {
 			t.Errorf("Expected status 200, got %d", protoResp.StatusCode())
 		}
 
-		var resp map[string]interface{}
-		json.Unmarshal(protoResp.Body(), &resp)
+		var apiResp utils.Response
+		json.Unmarshal(protoResp.Body(), &apiResp)
 
-		if data, ok := resp["data"].(map[string]interface{}); ok {
-			if token, ok := data["token"].(string); ok {
-				testToken = token
+		if apiResp.Data != nil {
+			if data, ok := apiResp.Data.(map[string]interface{}); ok {
+				if token, ok := data["token"].(string); ok {
+					testToken = token
+				}
 			}
 		}
 
 		if testToken == "" {
 			t.Error("Failed to get token from login response")
+			t.Logf("Response body: %s", string(protoResp.Body()))
 		}
 	})
 

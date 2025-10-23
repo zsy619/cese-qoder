@@ -21,13 +21,13 @@ func CreateTemplateHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 从上下文获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
-	template, err := templateService.CreateTemplate(userPhone.(string), &req)
+	template, err := templateService.CreateTemplate(userMobile.(string), &req)
 	if err != nil {
 		utils.ResponseError(&ctx, c, utils.CodeError, err.Error())
 		return
@@ -46,13 +46,13 @@ func GetTemplatesHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 从上下文获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
-	templates, total, err := templateService.GetTemplates(userPhone.(string), &req)
+	templates, total, err := templateService.GetTemplates(userMobile.(string), &req)
 	if err != nil {
 		utils.ResponseError(&ctx, c, utils.CodeError, err.Error())
 		return
@@ -73,13 +73,13 @@ func GetTemplateByIDHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 从上下文获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
-	template, err := templateService.GetTemplateByID(userPhone.(string), id)
+	template, err := templateService.GetTemplateByID(userMobile.(string), id)
 	if err != nil {
 		code := utils.CodeNotFound
 		if err.Error() == "模板不存在或无权访问" {
@@ -110,13 +110,13 @@ func UpdateTemplateHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 从上下文获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
-	template, err := templateService.UpdateTemplate(userPhone.(string), id, &req)
+	template, err := templateService.UpdateTemplate(userMobile.(string), id, &req)
 	if err != nil {
 		code := utils.CodeError
 		if err.Error() == "模板不存在或无权操作" {
@@ -141,13 +141,13 @@ func DeleteTemplateHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 从上下文获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
-	err = templateService.DeleteTemplate(userPhone.(string), id)
+	err = templateService.DeleteTemplate(userMobile.(string), id)
 	if err != nil {
 		code := utils.CodeError
 		if err.Error() == "模板不存在或无权操作" {

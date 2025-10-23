@@ -9,10 +9,9 @@ import (
 )
 
 // CreateAPIProvider 创建API Provider配置
-func CreateAPIProvider(userPhone string, req *models.APIProviderCreateRequest) (*models.APIProvider, error) {
-	// 获取用户ID
-	user, err := GetUserByPhone(userPhone)
-	if err != nil {
+func CreateAPIProvider(userMobile string, req *models.APIProviderCreateRequest) (*models.APIProvider, error) {
+	// 验证用户存在
+	if _, err := GetUserByMobile(userMobile); err != nil {
 		return nil, err
 	}
 
@@ -38,7 +37,7 @@ func CreateAPIProvider(userPhone string, req *models.APIProviderCreateRequest) (
 
 	// 创建Provider
 	provider := &models.APIProvider{
-		UserID:     user.ID,
+		Mobile:     userMobile,
 		Name:       req.Name,
 		APIKey:     encryptedKey,
 		APISecret:  encryptedSecret,
@@ -46,7 +45,8 @@ func CreateAPIProvider(userPhone string, req *models.APIProviderCreateRequest) (
 		APIType:    req.APIType,
 		APIModel:   req.APIModel,
 		APIVersion: req.APIVersion,
-		APIStatus:  1, // 默认启用
+		APIStatus:  1,           // 默认启用
+		APIOpen:    req.APIOpen, // 私有/公开
 		APIRemark:  req.APIRemark,
 	}
 
@@ -63,15 +63,10 @@ func CreateAPIProvider(userPhone string, req *models.APIProviderCreateRequest) (
 }
 
 // GetAPIProvider 获取单个API Provider
-func GetAPIProvider(userPhone string, providerID uint) (*models.APIProvider, error) {
-	user, err := GetUserByPhone(userPhone)
-	if err != nil {
-		return nil, err
-	}
-
+func GetAPIProvider(userMobile string, providerID uint) (*models.APIProvider, error) {
 	var provider models.APIProvider
 	db := config.GetDB()
-	if err := db.Where("id = ? AND user_id = ?", providerID, user.ID).First(&provider).Error; err != nil {
+	if err := db.Where("id = ? AND mobile = ?", providerID, userMobile).First(&provider).Error; err != nil {
 		return nil, errors.New("Provider not found")
 	}
 
@@ -79,15 +74,10 @@ func GetAPIProvider(userPhone string, providerID uint) (*models.APIProvider, err
 }
 
 // ListAPIProviders 获取用户的所有API Provider
-func ListAPIProviders(userPhone string, apiType string, status *int8) ([]models.APIProvider, error) {
-	user, err := GetUserByPhone(userPhone)
-	if err != nil {
-		return nil, err
-	}
-
+func ListAPIProviders(userMobile string, apiType string, status *int8) ([]models.APIProvider, error) {
 	var providers []models.APIProvider
 	db := config.GetDB()
-	query := db.Where("user_id = ?", user.ID)
+	query := db.Where("mobile = ?", userMobile)
 
 	if apiType != "" {
 		query = query.Where("api_type = ?", apiType)
@@ -104,9 +94,44 @@ func ListAPIProviders(userPhone string, apiType string, status *int8) ([]models.
 	return providers, nil
 }
 
+// ListAvailableProviders 获取用户可用的API Provider列表（包括自己私有的和公开的）
+func ListAvailableProviders(userMobile string, apiType string) ([]models.APIProvider, error) {
+	var providers []models.APIProvider
+	db := config.GetDB()
+
+	// 构建查询：(自己的私有Provider且启用) OR (公开的Provider且启用)
+	query := db.Where("api_status = ?", 1)
+
+	if apiType != "" {
+		query = query.Where("api_type = ?", apiType)
+	}
+
+	// 添加条件：自己私有的 OR 公开的
+	query = query.Where("(mobile = ? AND api_open = 0) OR api_open = 1", userMobile)
+
+	// 排序：先私有（自己的），再公开，最后按创建时间倒序
+	query = query.Order("(CASE WHEN mobile = '" + userMobile + "' THEN 0 ELSE 1 END), created_at DESC")
+
+	if err := query.Find(&providers).Error; err != nil {
+		return nil, err
+	}
+
+	// 去重（虽然正常情况不应该有重复）
+	seenIDs := make(map[uint]bool)
+	uniqueProviders := []models.APIProvider{}
+	for _, p := range providers {
+		if !seenIDs[p.ID] {
+			seenIDs[p.ID] = true
+			uniqueProviders = append(uniqueProviders, p)
+		}
+	}
+
+	return uniqueProviders, nil
+}
+
 // UpdateAPIProvider 更新API Provider
-func UpdateAPIProvider(userPhone string, providerID uint, req *models.APIProviderUpdateRequest) error {
-	provider, err := GetAPIProvider(userPhone, providerID)
+func UpdateAPIProvider(userMobile string, providerID uint, req *models.APIProviderUpdateRequest) error {
+	provider, err := GetAPIProvider(userMobile, providerID)
 	if err != nil {
 		return err
 	}
@@ -164,6 +189,10 @@ func UpdateAPIProvider(userPhone string, providerID uint, req *models.APIProvide
 		updates["api_status"] = *req.APIStatus
 	}
 
+	if req.APIOpen != nil {
+		updates["api_open"] = *req.APIOpen
+	}
+
 	if req.APIRemark != "" {
 		updates["api_remark"] = req.APIRemark
 	}
@@ -176,8 +205,8 @@ func UpdateAPIProvider(userPhone string, providerID uint, req *models.APIProvide
 }
 
 // DeleteAPIProvider 删除API Provider
-func DeleteAPIProvider(userPhone string, providerID uint) error {
-	provider, err := GetAPIProvider(userPhone, providerID)
+func DeleteAPIProvider(userMobile string, providerID uint) error {
+	provider, err := GetAPIProvider(userMobile, providerID)
 	if err != nil {
 		return err
 	}

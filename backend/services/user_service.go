@@ -13,19 +13,19 @@ type UserService struct{}
 
 // RegisterRequest 注册请求
 type RegisterRequest struct {
-	Phone    string `json:"phone" binding:"required"`
+	Mobile   string `json:"mobile" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 // LoginRequest 登录请求
 type LoginRequest struct {
-	Phone    string `json:"phone" binding:"required"`
+	Mobile   string `json:"mobile" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 // ChangePasswordRequest 修改密码请求
 type ChangePasswordRequest struct {
-	Phone       string `json:"phone" binding:"required"`
+	Mobile      string `json:"mobile" binding:"required"`
 	OldPassword string `json:"old_password" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`
 }
@@ -33,7 +33,7 @@ type ChangePasswordRequest struct {
 // Register 用户注册
 func (s *UserService) Register(req *RegisterRequest) (*models.User, error) {
 	// 验证手机号格式
-	if !utils.ValidatePhone(req.Phone) {
+	if !utils.ValidatePhone(req.Mobile) {
 		return nil, errors.New("手机号格式错误")
 	}
 
@@ -44,7 +44,7 @@ func (s *UserService) Register(req *RegisterRequest) (*models.User, error) {
 
 	// 检查手机号是否已存在
 	var existUser models.User
-	if err := config.DB.Where("phone = ?", req.Phone).First(&existUser).Error; err == nil {
+	if err := config.DB.Where("mobile = ?", req.Mobile).First(&existUser).Error; err == nil {
 		return nil, errors.New("手机号已存在")
 	}
 
@@ -56,8 +56,10 @@ func (s *UserService) Register(req *RegisterRequest) (*models.User, error) {
 
 	// 创建用户
 	user := &models.User{
-		Phone:    req.Phone,
-		Password: hashedPassword,
+		Mobile:     req.Mobile,
+		UserType:   "normal",
+		UserStatus: 1,
+		Password:   hashedPassword,
 	}
 
 	if err := config.DB.Create(user).Error; err != nil {
@@ -70,13 +72,13 @@ func (s *UserService) Register(req *RegisterRequest) (*models.User, error) {
 // Login 用户登录
 func (s *UserService) Login(req *LoginRequest) (string, *models.User, error) {
 	// 验证手机号格式
-	if !utils.ValidatePhone(req.Phone) {
+	if !utils.ValidatePhone(req.Mobile) {
 		return "", nil, errors.New("手机号格式错误")
 	}
 
 	// 查询用户
 	var user models.User
-	if err := config.DB.Where("phone = ?", req.Phone).First(&user).Error; err != nil {
+	if err := config.DB.Where("mobile = ?", req.Mobile).First(&user).Error; err != nil {
 		return "", nil, errors.New("手机号不存在")
 	}
 
@@ -86,7 +88,7 @@ func (s *UserService) Login(req *LoginRequest) (string, *models.User, error) {
 	}
 
 	// 生成 Token
-	token, err := utils.GenerateToken(user.Phone)
+	token, err := utils.GenerateToken(user.Mobile)
 	if err != nil {
 		return "", nil, errors.New("生成 Token 失败")
 	}
@@ -97,7 +99,7 @@ func (s *UserService) Login(req *LoginRequest) (string, *models.User, error) {
 // ChangePassword 修改密码
 func (s *UserService) ChangePassword(req *ChangePasswordRequest) error {
 	// 验证手机号格式
-	if !utils.ValidatePhone(req.Phone) {
+	if !utils.ValidatePhone(req.Mobile) {
 		return errors.New("手机号格式错误")
 	}
 
@@ -108,7 +110,7 @@ func (s *UserService) ChangePassword(req *ChangePasswordRequest) error {
 
 	// 查询用户
 	var user models.User
-	if err := config.DB.Where("phone = ?", req.Phone).First(&user).Error; err != nil {
+	if err := config.DB.Where("mobile = ?", req.Mobile).First(&user).Error; err != nil {
 		return errors.New("手机号不存在")
 	}
 
@@ -132,20 +134,25 @@ func (s *UserService) ChangePassword(req *ChangePasswordRequest) error {
 }
 
 // GetUserInfo 获取用户信息
-func (s *UserService) GetUserInfo(phone string) (*models.User, error) {
+func (s *UserService) GetUserInfo(mobile string) (*models.User, error) {
 	var user models.User
-	if err := config.DB.Where("phone = ?", phone).First(&user).Error; err != nil {
+	if err := config.DB.Where("mobile = ?", mobile).First(&user).Error; err != nil {
 		return nil, errors.New("用户不存在")
 	}
 
 	return &user, nil
 }
 
-// GetUserByPhone 根据手机号获取用户（供其他服务调用）
-func GetUserByPhone(phone string) (*models.User, error) {
+// GetUserByMobile 根据手机号获取用户（供其他服务调用）
+func GetUserByMobile(mobile string) (*models.User, error) {
 	var user models.User
-	if err := config.DB.Where("phone = ?", phone).First(&user).Error; err != nil {
+	if err := config.DB.Where("mobile = ?", mobile).First(&user).Error; err != nil {
 		return nil, errors.New("用户不存在")
 	}
 	return &user, nil
+}
+
+// GetUserByPhone 根据手机号获取用户（向下兼容，已废弃）
+func GetUserByPhone(phone string) (*models.User, error) {
+	return GetUserByMobile(phone)
 }

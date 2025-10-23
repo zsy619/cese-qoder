@@ -77,14 +77,14 @@ func ChangePasswordHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 从上下文获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
 	// 验证是否为本人操作
-	if userPhone.(string) != req.Phone {
+	if userMobile.(string) != req.Mobile {
 		utils.ResponseError(&ctx, c, utils.CodeForbidden, "无权修改他人密码")
 		return
 	}
@@ -110,13 +110,13 @@ func ChangePasswordHandler(ctx context.Context, c *app.RequestContext) {
 // GET /api/v1/user/info
 func GetUserInfoHandler(ctx context.Context, c *app.RequestContext) {
 	// 从上下文获取用户信息
-	userPhone, exists := c.Get("userPhone")
+	userMobile, exists := c.Get("userMobile")
 	if !exists {
 		utils.ResponseError(&ctx, c, utils.CodeUnauthorized, "未认证")
 		return
 	}
 
-	user, err := userService.GetUserInfo(userPhone.(string))
+	user, err := userService.GetUserInfo(userMobile.(string))
 	if err != nil {
 		utils.ResponseError(&ctx, c, utils.CodeNotFound, err.Error())
 		return
