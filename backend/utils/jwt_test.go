@@ -31,8 +31,8 @@ func TestGenerateToken(t *testing.T) {
 	if err != nil {
 		t.Errorf("ParseToken() failed for generated token: %v", err)
 	}
-	if claims.UserID != phone {
-		t.Errorf("ParseToken() UserID = %v, want %v", claims.UserID, phone)
+	if claims.Mobile != phone {
+		t.Errorf("ParseToken() Mobile = %v, want %v", claims.Mobile, phone)
 	}
 }
 
@@ -68,8 +68,8 @@ func TestParseToken(t *testing.T) {
 				if claims == nil {
 					t.Error("ParseToken() returned nil claims for valid token")
 				}
-				if claims.UserID != phone {
-					t.Errorf("ParseToken() UserID = %v, want %v", claims.UserID, phone)
+				if claims.Mobile != phone {
+					t.Errorf("ParseToken() Mobile = %v, want %v", claims.Mobile, phone)
 				}
 			}
 		})

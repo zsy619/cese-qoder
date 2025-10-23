@@ -34,7 +34,7 @@ func getJWTConfig() ([]byte, time.Duration) {
 
 // Claims JWT 声明结构体
 type Claims struct {
-	UserID string `json:"user_id"` // 用户ID（手机号码）
+	Mobile string `json:"mobile"` // 用户手机号码
 	jwt.RegisteredClaims
 }
 
@@ -43,7 +43,7 @@ func GenerateToken(phone string) (string, error) {
 	secret, expireDuration := getJWTConfig()
 
 	claims := &Claims{
-		UserID: phone,
+		Mobile: phone,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expireDuration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -88,5 +88,5 @@ func RefreshToken(tokenString string) (string, error) {
 	}
 
 	// 生成新 Token
-	return GenerateToken(claims.UserID)
+	return GenerateToken(claims.Mobile)
 }
