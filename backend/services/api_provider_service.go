@@ -26,23 +26,12 @@ func CreateAPIProvider(userMobile string, req *models.APIProviderCreateRequest) 
 		return nil, err
 	}
 
-	// 加密API Secret（如果有）
-	var encryptedSecret string
-	if req.APISecret != "" {
-		encryptedSecret, err = utils.EncryptData(req.APISecret, encryptionKey)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// 创建Provider
 	provider := &models.APIProvider{
 		Mobile:     userMobile,
 		Name:       req.Name,
 		APIKey:     encryptedKey,
-		APISecret:  encryptedSecret,
 		APIURL:     req.APIURL,
-		APIType:    req.APIType,
 		APIModel:   req.APIModel,
 		APIVersion: req.APIVersion,
 		APIStatus:  1,           // 默认启用
@@ -74,14 +63,10 @@ func GetAPIProvider(userMobile string, providerID uint) (*models.APIProvider, er
 }
 
 // ListAPIProviders 获取用户的所有API Provider
-func ListAPIProviders(userMobile string, apiType string, status *int8) ([]models.APIProvider, error) {
+func ListAPIProviders(userMobile string, status *int8) ([]models.APIProvider, error) {
 	var providers []models.APIProvider
 	db := config.GetDB()
 	query := db.Where("mobile = ?", userMobile)
-
-	if apiType != "" {
-		query = query.Where("api_type = ?", apiType)
-	}
 
 	if status != nil {
 		query = query.Where("api_status = ?", *status)
@@ -95,16 +80,12 @@ func ListAPIProviders(userMobile string, apiType string, status *int8) ([]models
 }
 
 // ListAvailableProviders 获取用户可用的API Provider列表（包括自己私有的和公开的）
-func ListAvailableProviders(userMobile string, apiType string) ([]models.APIProvider, error) {
+func ListAvailableProviders(userMobile string) ([]models.APIProvider, error) {
 	var providers []models.APIProvider
 	db := config.GetDB()
 
 	// 构建查询：(自己的私有Provider且启用) OR (公开的Provider且启用)
 	query := db.Where("api_status = ?", 1)
-
-	if apiType != "" {
-		query = query.Where("api_type = ?", apiType)
-	}
 
 	// 添加条件：自己私有的 OR 公开的
 	query = query.Where("(mobile = ? AND api_open = 0) OR api_open = 1", userMobile)
@@ -156,27 +137,6 @@ func UpdateAPIProvider(userMobile string, providerID uint, req *models.APIProvid
 		updates["api_key"] = encryptedKey
 	}
 
-	if req.APISecret != "" {
-		// 加密新的API Secret
-		encryptionKey, err := getOrCreateEncryptionKey()
-		if err != nil {
-			return err
-		}
-		encryptedSecret, err := utils.EncryptData(req.APISecret, encryptionKey)
-		if err != nil {
-			return err
-		}
-		updates["api_secret"] = encryptedSecret
-	}
-
-	if req.APIURL != "" {
-		updates["api_url"] = req.APIURL
-	}
-
-	if req.APIType != "" {
-		updates["api_type"] = req.APIType
-	}
-
 	if req.APIModel != "" {
 		updates["api_model"] = req.APIModel
 	}
@@ -223,20 +183,6 @@ func GetDecryptedAPIKey(provider *models.APIProvider) (string, error) {
 	}
 
 	return utils.DecryptData(provider.APIKey, encryptionKey)
-}
-
-// GetDecryptedAPISecret 获取解密后的API Secret（内部使用）
-func GetDecryptedAPISecret(provider *models.APIProvider) (string, error) {
-	if provider.APISecret == "" {
-		return "", nil
-	}
-
-	encryptionKey, err := getOrCreateEncryptionKey()
-	if err != nil {
-		return "", err
-	}
-
-	return utils.DecryptData(provider.APISecret, encryptionKey)
 }
 
 // getOrCreateEncryptionKey 获取或创建加密密钥

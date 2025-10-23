@@ -46,6 +46,8 @@ const (
 
 // Success 成功响应
 func Success(c *context.Context, ctx *app.RequestContext, data interface{}) {
+	// 设置响应头，明确指定UTF-8编码
+	ctx.Response.Header.Set("Content-Type", "application/json; charset=utf-8")
 	ctx.JSON(consts.StatusOK, Response{
 		Code:    CodeSuccess,
 		Message: "success",
@@ -55,6 +57,8 @@ func Success(c *context.Context, ctx *app.RequestContext, data interface{}) {
 
 // SuccessWithMessage 成功响应（自定义消息）
 func SuccessWithMessage(c *context.Context, ctx *app.RequestContext, message string, data interface{}) {
+	// 设置响应头，明确指定UTF-8编码
+	ctx.Response.Header.Set("Content-Type", "application/json; charset=utf-8")
 	ctx.JSON(consts.StatusOK, Response{
 		Code:    CodeSuccess,
 		Message: message,
@@ -64,6 +68,8 @@ func SuccessWithMessage(c *context.Context, ctx *app.RequestContext, message str
 
 // ResponseError 错误响应
 func ResponseError(c *context.Context, ctx *app.RequestContext, code int, message string) {
+	// 设置响应头，明确指定UTF-8编码
+	ctx.Response.Header.Set("Content-Type", "application/json; charset=utf-8")
 	ctx.JSON(consts.StatusOK, Response{
 		Code:    code,
 		Message: message,
@@ -73,6 +79,8 @@ func ResponseError(c *context.Context, ctx *app.RequestContext, code int, messag
 
 // ErrorWithData 错误响应（带数据）
 func ErrorWithData(c *context.Context, ctx *app.RequestContext, code int, message string, data interface{}) {
+	// 设置响应头，明确指定UTF-8编码
+	ctx.Response.Header.Set("Content-Type", "application/json; charset=utf-8")
 	ctx.JSON(consts.StatusOK, Response{
 		Code:    code,
 		Message: message,
@@ -82,6 +90,8 @@ func ErrorWithData(c *context.Context, ctx *app.RequestContext, code int, messag
 
 // PageSuccess 分页成功响应
 func PageSuccess(c *context.Context, ctx *app.RequestContext, list interface{}, total int64, page, pageSize int) {
+	// 设置响应头，明确指定UTF-8编码
+	ctx.Response.Header.Set("Content-Type", "application/json; charset=utf-8")
 	ctx.JSON(consts.StatusOK, Response{
 		Code:    CodeSuccess,
 		Message: "success",

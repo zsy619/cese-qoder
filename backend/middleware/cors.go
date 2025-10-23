@@ -19,6 +19,8 @@ func CORSMiddleware() app.HandlerFunc {
 		c.Header("Access-Control-Allow-Credentials", "true")
 		// 预检请求有效期
 		c.Header("Access-Control-Max-Age", "3600")
+		// 设置默认响应头为UTF-8编码
+		c.Header("Content-Type", "application/json; charset=utf-8")
 
 		// 处理预检请求
 		if string(c.Method()) == "OPTIONS" {

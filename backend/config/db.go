@@ -27,13 +27,13 @@ type DBConfig struct {
 // InitDB 初始化数据库连接
 func InitDB(config *DBConfig) error {
 	// 构建 DSN
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
+	// charset=utf8mb4 参数会设置 connection 的字符集，确保正确处理中文
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=True&loc=Local",
 		config.User,
 		config.Password,
 		config.Host,
 		config.Port,
 		config.DBName,
-		config.Charset,
 	)
 
 	// 连接数据库
@@ -44,6 +44,12 @@ func InitDB(config *DBConfig) error {
 
 	if err != nil {
 		return fmt.Errorf("failed to connect database: %w", err)
+	}
+
+	// 设置连接字符集为 utf8mb4，解决中文乱码问题
+	// 这会设置 character_set_client, character_set_connection, character_set_results 为 utf8mb4
+	if err := DB.Exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci").Error; err != nil {
+		return fmt.Errorf("failed to set character set: %w", err)
 	}
 
 	// 获取底层 SQL DB 对象配置连接池

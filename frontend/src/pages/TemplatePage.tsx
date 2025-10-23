@@ -1,7 +1,9 @@
 import { useReducer, useState } from 'react';
+import Login from '../components/Login';
 import PreviewSection from '../components/PreviewSection';
 import SixElementCard from '../components/SixElementCard';
 import Toast, { ToastType } from '../components/Toast';
+import { TemplateService, UserService } from '../services';
 import '../styles/app.css';
 import { FieldName, TemplateData, validateTemplateData } from '../utils/validation';
 
@@ -86,6 +88,11 @@ const TemplatePage = () => {
   const [toast, setToast] = useState<ToastState | null>(null);
 
   /**
+   * 登录弹窗显示状态
+   */
+  const [showLogin, setShowLogin] = useState(false);
+
+  /**
    * 显示 Toast 提示
    * @param {string} message - 提示消息
    * @param {ToastType} type - 提示类型: success, error, warning, info
@@ -128,6 +135,13 @@ const TemplatePage = () => {
    * 验证表单并生成模板
    */
   const handleGenerateTemplate = () => {
+    // 检查登录状态
+    if (!UserService.isLoggedIn()) {
+      showToast('请先登录后再生成模板', 'warning');
+      setShowLogin(true);
+      return;
+    }
+
     const validation = validateTemplateData(templateData);
     
     if (!validation.isValid) {
@@ -143,9 +157,16 @@ const TemplatePage = () => {
 
   /**
    * 处理保存模板按钮点击
-   * 验证表单并保存模板
+   * 验证表单并保存模板到后端API
    */
-  const handleSaveTemplate = () => {
+  const handleSaveTemplate = async () => {
+    // 检查登录状态
+    if (!UserService.isLoggedIn()) {
+      showToast('请先登录后再保存模板', 'warning');
+      setShowLogin(true);
+      return;
+    }
+
     const validation = validateTemplateData(templateData);
     
     if (!validation.isValid) {
@@ -154,9 +175,23 @@ const TemplatePage = () => {
       return;
     }
 
-    // 这里可以调用后端API保存模板
-    console.log('保存模板:', templateData);
-    showToast('模板保存成功！', 'success');
+    try {
+      // 调用后端API保存模板
+      await TemplateService.create({
+        topic: templateData.topic,
+        task_objective: templateData.taskObjective,
+        ai_role: templateData.aiRole,
+        my_role: templateData.myRole,
+        key_information: templateData.keyInformation,
+        behavior_rule: templateData.behaviorRules,
+        delivery_format: templateData.deliveryFormat,
+      });
+      
+      showToast('模板保存成功！', 'success');
+    } catch (error: any) {
+      console.error('保存模板失败:', error);
+      showToast(error.message || '保存失败，请重试', 'error');
+    }
   };
 
   /**
@@ -251,6 +286,13 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
 `;
   };
 
+  /**
+   * 登录成功后的回调
+   */
+  const handleLoginSuccess = () => {
+    showToast('登录成功！', 'success');
+  };
+
   return (
     <>
       {/* Toast 提示 */}
@@ -262,6 +304,13 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
           onClose={closeToast}
         />
       )}
+
+      {/* 登录弹窗 */}
+      <Login
+        visible={showLogin}
+        onClose={() => setShowLogin(false)}
+        onSuccess={handleLoginSuccess}
+      />
 
       <div className="container">
       <div className="template-form">

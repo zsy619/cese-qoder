@@ -13,6 +13,7 @@ func TestHashPassword(t *testing.T) {
 	if err != nil {
 		t.Fatalf("HashPassword() error = %v", err)
 	}
+	t.Logf("\n加密后的密码为：%s", hashed)
 
 	// 验证加密后的密码长度（96字符）
 	if len(hashed) != 96 {

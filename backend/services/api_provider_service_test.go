@@ -44,7 +44,6 @@ func TestCreateAPIProvider(t *testing.T) {
 		Name:      "DeepSeek Test",
 		APIKey:    "sk-test-key-123456",
 		APIURL:    "https://api.deepseek.com",
-		APIType:   "deepseek",
 		APIModel:  "deepseek-chat",
 		APIRemark: "测试Provider",
 	}
@@ -60,10 +59,6 @@ func TestCreateAPIProvider(t *testing.T) {
 
 	if provider.Name != req.Name {
 		t.Errorf("CreateAPIProvider() Name = %v, want %v", provider.Name, req.Name)
-	}
-
-	if provider.APIType != req.APIType {
-		t.Errorf("CreateAPIProvider() APIType = %v, want %v", provider.APIType, req.APIType)
 	}
 
 	// 清理
@@ -93,14 +88,12 @@ func TestListAPIProviders(t *testing.T) {
 			Name:     "Provider 1",
 			APIKey:   "key1",
 			APIURL:   "https://api1.com",
-			APIType:  "openai",
 			APIModel: "gpt-4",
 		},
 		{
 			Name:     "Provider 2",
 			APIKey:   "key2",
 			APIURL:   "https://api2.com",
-			APIType:  "deepseek",
 			APIModel: "deepseek-chat",
 		},
 	}
@@ -122,23 +115,13 @@ func TestListAPIProviders(t *testing.T) {
 	}()
 
 	// 测试获取所有Provider
-	list, err := ListAPIProviders(testMobile, "", nil)
+	list, err := ListAPIProviders(testMobile, nil)
 	if err != nil {
 		t.Fatalf("ListAPIProviders() error = %v", err)
 	}
 
 	if len(list) < 2 {
 		t.Errorf("ListAPIProviders() got %d providers, want at least 2", len(list))
-	}
-
-	// 测试按类型过滤
-	list, err = ListAPIProviders(testMobile, "deepseek", nil)
-	if err != nil {
-		t.Fatalf("ListAPIProviders() with type filter error = %v", err)
-	}
-
-	if len(list) < 1 {
-		t.Errorf("ListAPIProviders() with type filter got %d providers, want at least 1", len(list))
 	}
 }
 
@@ -164,7 +147,6 @@ func TestUpdateAPIProvider(t *testing.T) {
 		Name:     "Original Name",
 		APIKey:   "original-key",
 		APIURL:   "https://original.com",
-		APIType:  "openai",
 		APIModel: "gpt-3.5",
 	}
 
@@ -222,7 +204,6 @@ func TestDeleteAPIProvider(t *testing.T) {
 		Name:     "To Delete",
 		APIKey:   "delete-key",
 		APIURL:   "https://delete.com",
-		APIType:  "openai",
 		APIModel: "gpt-3.5",
 	}
 
@@ -263,17 +244,14 @@ func TestEncryptionDecryption(t *testing.T) {
 	db.Create(user)
 	defer db.Delete(user)
 
-	// 创建带Secret的Provider
+	// 创建Provider测试加密
 	originalAPIKey := "sk-original-api-key-123456"
-	originalAPISecret := "secret-value-789"
 
 	createReq := &models.APIProviderCreateRequest{
-		Name:      "Encryption Test",
-		APIKey:    originalAPIKey,
-		APISecret: originalAPISecret,
-		APIURL:    "https://api.test.com",
-		APIType:   "openai",
-		APIModel:  "gpt-4",
+		Name:     "Encryption Test",
+		APIKey:   originalAPIKey,
+		APIURL:   "https://api.test.com",
+		APIModel: "gpt-4",
 	}
 
 	provider, err := CreateAPIProvider(testMobile, createReq)
@@ -295,15 +273,5 @@ func TestEncryptionDecryption(t *testing.T) {
 
 	if decryptedKey != originalAPIKey {
 		t.Errorf("GetDecryptedAPIKey() = %v, want %v", decryptedKey, originalAPIKey)
-	}
-
-	// 测试Secret解密
-	decryptedSecret, err := GetDecryptedAPISecret(provider)
-	if err != nil {
-		t.Fatalf("GetDecryptedAPISecret() error = %v", err)
-	}
-
-	if decryptedSecret != originalAPISecret {
-		t.Errorf("GetDecryptedAPISecret() = %v, want %v", decryptedSecret, originalAPISecret)
 	}
 }

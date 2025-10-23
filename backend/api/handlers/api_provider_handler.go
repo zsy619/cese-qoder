@@ -25,18 +25,10 @@ func CreateAPIProviderHandler(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	if !utils.ValidateRequired(req.APIKey) {
-		utils.ResponseError(&ctx, c, utils.CodeInvalidParams, "API Key不能为空")
-		return
-	}
+	// API Key 改为可选，不需要验证
 
 	if !utils.ValidateRequired(req.APIURL) {
 		utils.ResponseError(&ctx, c, utils.CodeInvalidParams, "API URL不能为空")
-		return
-	}
-
-	if !utils.ValidateRequired(req.APIType) {
-		utils.ResponseError(&ctx, c, utils.CodeInvalidParams, "API类型不能为空")
 		return
 	}
 
@@ -93,7 +85,6 @@ func GetAPIProviderHandler(ctx context.Context, c *app.RequestContext) {
 // ListAPIProvidersHandler 获取用户的所有API Provider
 func ListAPIProvidersHandler(ctx context.Context, c *app.RequestContext) {
 	// 获取查询参数
-	apiType := c.Query("api_type")
 	statusStr := c.Query("status")
 
 	var status *int8
@@ -113,7 +104,7 @@ func ListAPIProvidersHandler(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取Provider列表
-	providers, err := services.ListAPIProviders(userMobile.(string), apiType, status)
+	providers, err := services.ListAPIProviders(userMobile.(string), status)
 	if err != nil {
 		utils.Error("Failed to list API Providers", zap.Error(err))
 		utils.ResponseError(&ctx, c, utils.CodeServerError, "查询失败")

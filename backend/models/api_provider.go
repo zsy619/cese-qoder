@@ -9,14 +9,12 @@ type APIProvider struct {
 	ID         uint      `json:"id" gorm:"primaryKey;autoIncrement"`
 	Mobile     string    `json:"mobile" gorm:"type:varchar(32);not null;index"`
 	Name       string    `json:"name" gorm:"type:varchar(100);not null"`
-	APIKey     string    `json:"api_key" gorm:"type:varchar(255);not null"`
-	APISecret  string    `json:"api_secret,omitempty" gorm:"type:varchar(255)"`
+	APIKey     string    `json:"api_key" gorm:"type:varchar(255)"` // 改为可选，移除 not null
 	APIURL     string    `json:"api_url" gorm:"type:varchar(500);not null"`
-	APIType    string    `json:"api_type" gorm:"type:varchar(50);not null;index"`
 	APIModel   string    `json:"api_model" gorm:"type:varchar(100);not null"`
 	APIVersion string    `json:"api_version" gorm:"type:varchar(20);default:'v1'"`
 	APIStatus  int8      `json:"api_status" gorm:"type:tinyint(1);default:1;index"`
-	APIOpen    int       `json:"api_open" gorm:"type:int;default:0;index"`
+	APIOpen    int8      `json:"api_open" gorm:"type:tinyint(1);default:0;index"`
 	APIRemark  string    `json:"api_remark,omitempty" gorm:"type:text"`
 	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt  time.Time `json:"updated_at" gorm:"autoUpdateTime"`
@@ -30,13 +28,11 @@ func (APIProvider) TableName() string {
 // APIProviderCreateRequest 创建API Provider请求
 type APIProviderCreateRequest struct {
 	Name       string `json:"name" binding:"required"`
-	APIKey     string `json:"api_key" binding:"required"`
-	APISecret  string `json:"api_secret"`
+	APIKey     string `json:"api_key"` // 移除 required，改为可选
 	APIURL     string `json:"api_url" binding:"required"`
-	APIType    string `json:"api_type" binding:"required"`
 	APIModel   string `json:"api_model" binding:"required"`
 	APIVersion string `json:"api_version"`
-	APIOpen    int    `json:"api_open"`
+	APIOpen    int8   `json:"api_open"`
 	APIRemark  string `json:"api_remark"`
 }
 
@@ -44,13 +40,11 @@ type APIProviderCreateRequest struct {
 type APIProviderUpdateRequest struct {
 	Name       string `json:"name"`
 	APIKey     string `json:"api_key"`
-	APISecret  string `json:"api_secret"`
 	APIURL     string `json:"api_url"`
-	APIType    string `json:"api_type"`
 	APIModel   string `json:"api_model"`
 	APIVersion string `json:"api_version"`
 	APIStatus  *int8  `json:"api_status"`
-	APIOpen    *int   `json:"api_open"`
+	APIOpen    *int8  `json:"api_open"`
 	APIRemark  string `json:"api_remark"`
 }
 
@@ -61,11 +55,10 @@ type APIProviderResponse struct {
 	Name       string    `json:"name"`
 	APIKeyMask string    `json:"api_key_mask"` // 脱敏后的密钥
 	APIURL     string    `json:"api_url"`
-	APIType    string    `json:"api_type"`
 	APIModel   string    `json:"api_model"`
 	APIVersion string    `json:"api_version"`
 	APIStatus  int8      `json:"api_status"`
-	APIOpen    int       `json:"api_open"`
+	APIOpen    int8      `json:"api_open"`
 	APIRemark  string    `json:"api_remark,omitempty"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
@@ -79,7 +72,6 @@ func (p *APIProvider) ToResponse() *APIProviderResponse {
 		Name:       p.Name,
 		APIKeyMask: maskAPIKey(p.APIKey),
 		APIURL:     p.APIURL,
-		APIType:    p.APIType,
 		APIModel:   p.APIModel,
 		APIVersion: p.APIVersion,
 		APIStatus:  p.APIStatus,

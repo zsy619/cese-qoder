@@ -1,0 +1,218 @@
+/* 确认对话框组件样式 */
+
+/* 遮罩层 */
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 9998;
+  animation: confirm-overlay-fade-in 0.3s ease-out;
+}
+
+@keyframes confirm-overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 对话框容器 */
+.confirm-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  animation: confirm-zoom-in 0.3s ease-out;
+}
+
+@keyframes confirm-zoom-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* 对话框 */
+.confirm-dialog {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  min-width: 380px;
+  max-width: 500px;
+  overflow: hidden;
+}
+
+/* 头部 */
+.confirm-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 24px 16px 24px;
+}
+
+.confirm-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.confirm-icon-primary {
+  background-color: rgba(106, 90, 205, 0.1);
+  color: #6a5acd;
+}
+
+.confirm-icon-danger {
+  background-color: rgba(255, 77, 79, 0.1);
+  color: #ff4d4f;
+}
+
+.confirm-icon-warning {
+  background-color: rgba(250, 173, 20, 0.1);
+  color: #faad14;
+}
+
+.confirm-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+/* 内容 */
+.confirm-body {
+  padding: 0 24px 24px 24px;
+}
+
+.confirm-message {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+  padding-left: 52px; /* 对齐图标右侧 */
+}
+
+/* 底部按钮区 */
+.confirm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background-color: #fafafa;
+  border-top: 1px solid #f0f0f0;
+}
+
+.confirm-btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.confirm-btn:active {
+  transform: scale(0.98);
+}
+
+/* 取消按钮 */
+.confirm-btn-cancel {
+  background-color: #ffffff;
+  color: #666;
+  border: 1.5px solid #d9d9d9;
+}
+
+.confirm-btn-cancel:hover {
+  color: #333;
+  border-color: #b3b3b3;
+  background-color: #fafafa;
+}
+
+/* 确认按钮 - 主要 */
+.confirm-btn-confirm.confirm-btn-primary {
+  background: linear-gradient(135deg, #6a5acd 0%, #7b68d9 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(106, 90, 205, 0.3);
+}
+
+.confirm-btn-confirm.confirm-btn-primary:hover {
+  background: linear-gradient(135deg, #5a4ab8 0%, #6b58c9 100%);
+  box-shadow: 0 4px 12px rgba(106, 90, 205, 0.4);
+  transform: translateY(-1px);
+}
+
+/* 确认按钮 - 危险 */
+.confirm-btn-confirm.confirm-btn-danger {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+}
+
+.confirm-btn-confirm.confirm-btn-danger:hover {
+  background: linear-gradient(135deg, #ff2020 0%, #ff5555 100%);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+  transform: translateY(-1px);
+}
+
+/* 确认按钮 - 警告 */
+.confirm-btn-confirm.confirm-btn-warning {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(250, 173, 20, 0.3);
+}
+
+.confirm-btn-confirm.confirm-btn-warning:hover {
+  background: linear-gradient(135deg, #d48806 0%, #faad14 100%);
+  box-shadow: 0 4px 12px rgba(250, 173, 20, 0.4);
+  transform: translateY(-1px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .confirm-dialog {
+    min-width: 320px;
+    max-width: 90vw;
+  }
+
+  .confirm-header {
+    padding: 20px 20px 12px 20px;
+  }
+
+  .confirm-title {
+    font-size: 16px;
+  }
+
+  .confirm-body {
+    padding: 0 20px 20px 20px;
+  }
+
+  .confirm-message {
+    font-size: 14px;
+    padding-left: 44px;
+  }
+
+  .confirm-footer {
+    padding: 12px 20px;
+    flex-direction: column-reverse;
+  }
+
+  .confirm-btn {
+    width: 100%;
+  }
+}
