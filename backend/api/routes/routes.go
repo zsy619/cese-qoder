@@ -57,6 +57,13 @@ func RegisterRoutes(h *server.Hertz) {
 		apiProvider.DELETE("/:id", handlers.DeleteAPIProviderHandler)
 	}
 
+	// ===== AI生成路由（全部需要认证）=====
+	generate := v1.Group("/generate")
+	generate.Use(middleware.AuthMiddleware())
+	{
+		generate.POST("", handlers.GenerateContentHandler)
+	}
+
 	// 健康检查接口
 	h.GET("/health", func(ctx context.Context, c *app.RequestContext) {
 		c.JSON(200, map[string]string{

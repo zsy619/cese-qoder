@@ -31,6 +31,10 @@ export type {
     Template, TemplateData, TemplateQueryParams
 } from './api';
 
+// 导出AI生成服务
+export { AIService } from './ai_service';
+export type { AIGenerateRequest, AIGenerateResponse } from './ai_service';
+
 // 向后兼容的导出
 export {
     createTemplate, deleteTemplate, exportTemplateAsJSON, exportTemplateAsMarkdown, getTemplateById, getTemplates, updateTemplate

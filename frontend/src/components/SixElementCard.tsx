@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 import '../styles/app.css';
+import AICreating from './AICreating';
+import Toast from './Toast';
 
 // 扩展 Window 接口以支持 webkitSpeechRecognition
 declare global {
@@ -15,6 +17,10 @@ interface SixElementCardProps {
   placeholder?: string;
   isTextarea?: boolean;
   error?: string;
+  /** 提示词模板内容 */
+  promptTemplate?: string;
+  /** 替换占位符的数据 */
+  placeholders?: Record<string, string>;
 }
 
 /**
@@ -22,9 +28,20 @@ interface SixElementCardProps {
  * 用于显示和输入六要素中的单个要素
  * 支持单行文本和多行文本输入
  */
-const SixElementCard: React.FC<SixElementCardProps> = ({ title, value, onChange, placeholder, isTextarea = false, error }) => {
+const SixElementCard: React.FC<SixElementCardProps> = ({ 
+  title, 
+  value, 
+  onChange, 
+  placeholder, 
+  isTextarea = false, 
+  error,
+  promptTemplate,
+  placeholders 
+}) => {
   const [isListening, setIsListening] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
+  const [showAICreating, setShowAICreating] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
 
@@ -82,6 +99,33 @@ const SixElementCard: React.FC<SixElementCardProps> = ({ title, value, onChange,
     }
   };
 
+  // 处理AI生成按钮点击
+  const handleAIGenerate = () => {
+    // 如果没有提供提示词模板，不显示AI生成
+    if (!promptTemplate) {
+      return;
+    }
+    
+    // 验证主题是否为空
+    if (!placeholders?.topic || placeholders.topic.trim() === '') {
+      setToast({ message: '请先输入主题后再使用AI生成功能', type: 'warning' });
+      return;
+    }
+    
+    setShowAICreating(true);
+  };
+
+  // 处理AI生成成功
+  const handleAISuccess = (content: string) => {
+    onChange(content);
+    setShowAICreating(false);
+  };
+
+  // 处理关闭AI生成
+  const handleCloseAI = () => {
+    setShowAICreating(false);
+  };
+
   // 处理最大化按钮点击
   const handleFullscreen = () => {
     setShowFullscreen(true);
@@ -109,6 +153,13 @@ const SixElementCard: React.FC<SixElementCardProps> = ({ title, value, onChange,
   const StopIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
       <rect x="6" y="6" width="12" height="12" rx="2"/>
+    </svg>
+  );
+
+  // AI对话图标SVG - 更符合AI特点的对话框样式
+  const AIIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
     </svg>
   );
 
@@ -145,13 +196,24 @@ const SixElementCard: React.FC<SixElementCardProps> = ({ title, value, onChange,
               </div>
               <div className="input-footer">
                 <span className="char-count">{charCount} 字符</span>
-                <button 
-                  className="fullscreen-button"
-                  onClick={handleFullscreen}
-                  title="全屏编辑"
-                >
-                  <FullscreenIcon />
-                </button>
+                <div className="footer-buttons">
+                  {promptTemplate && (
+                    <button 
+                      className="ai-generate-button"
+                      onClick={handleAIGenerate}
+                      title="AI生成"
+                    >
+                      <AIIcon />
+                    </button>
+                  )}
+                  <button 
+                    className="fullscreen-button"
+                    onClick={handleFullscreen}
+                    title="全屏编辑"
+                  >
+                    <FullscreenIcon />
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
@@ -197,6 +259,27 @@ const SixElementCard: React.FC<SixElementCardProps> = ({ title, value, onChange,
             </div>
           </div>
         </div>
+      )}
+      {/* AI生成模态框 */}
+      {showAICreating && promptTemplate && placeholders && (
+        <AICreating
+          visible={showAICreating}
+          onClose={handleCloseAI}
+          title={title}
+          promptTemplate={promptTemplate}
+          placeholders={placeholders}
+          onSuccess={handleAISuccess}
+        />
+      )}
+
+      {/* Toast 提示 */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          duration={3000}
+          onClose={() => setToast(null)}
+        />
       )}
     </>
   );

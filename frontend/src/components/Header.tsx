@@ -99,12 +99,13 @@ const Header: React.FC = () => {
             上下文工程六要素小工具
           </div>
           <nav className="nav-links">
-            <Link to="/" className="nav-link">首页</Link>
-            <Link to="/template" className="nav-link">模板生成</Link>
+            <Link to="/" className="nav-link">🏠 首页</Link>
+            <Link to="/template" className="nav-link">📝 模板生成</Link>
+            <Link to="/coze-agent" className="nav-link">🤖 Coze智能体</Link>
             {isLoggedIn && (
               <>
-                <Link to="/my-template" className="nav-link">我的模板</Link>
-                <Link to="/api-config" className="nav-link">API Config</Link>
+                <Link to="/my-template" className="nav-link">📋 我的模板</Link>
+                <Link to="/api-config" className="nav-link">⚙️ API Config</Link>
               </>
             )}
             {isLoggedIn ? (
@@ -113,7 +114,7 @@ const Header: React.FC = () => {
                 onClick={handleLogout}
                 title={`当前用户: ${userMobile}`}
               >
-                退出登录
+                🚪 退出登录
               </button>
             ) : (
               <>
@@ -121,13 +122,13 @@ const Header: React.FC = () => {
                   className="nav-link register-btn"
                   onClick={() => setShowRegister(true)}
                 >
-                  注册
+                  ✨ 注册
                 </button>
                 <button
                   className="nav-link login-btn"
                   onClick={() => setShowLogin(true)}
                 >
-                  登录
+                  🔑 登录
                 </button>
               </>
             )}

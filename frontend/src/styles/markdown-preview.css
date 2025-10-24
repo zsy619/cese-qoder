@@ -1,0 +1,178 @@
+/* Markdown预览容器 */
+.markdown-preview {
+  background-color: #f8f9fa;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e1e1e1;
+  line-height: 1.8;
+  color: #333;
+  overflow-x: auto;
+}
+
+/* 标题样式 */
+.markdown-preview .md-h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #6a5acd;
+  margin: 24px 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e1e1e1;
+}
+
+.markdown-preview .md-h1:first-child {
+  margin-top: 0;
+}
+
+.markdown-preview .md-h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #6a5acd;
+  margin: 20px 0 14px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.markdown-preview .md-h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 18px 0 12px 0;
+}
+
+/* 段落样式 */
+.markdown-preview .md-p {
+  margin: 12px 0;
+  color: #333;
+  font-size: 15px;
+}
+
+/* 列表样式 */
+.markdown-preview .md-ul {
+  margin: 12px 0;
+  padding-left: 28px;
+  list-style-type: disc;
+}
+
+.markdown-preview .md-li {
+  margin: 8px 0;
+  color: #333;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* 代码块样式 */
+.markdown-preview .code-block {
+  background-color: #2d2d2d;
+  color: #f8f8f2;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.markdown-preview .code-block code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* 行内代码样式 */
+.markdown-preview .inline-code {
+  background-color: #f0f0ff;
+  color: #6a5acd;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  border: 1px solid #e1e1ff;
+}
+
+/* 链接样式 */
+.markdown-preview .md-link {
+  color: #6a5acd;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.markdown-preview .md-link:hover {
+  border-bottom-color: #6a5acd;
+}
+
+/* 水平线 */
+.markdown-preview .md-hr {
+  border: none;
+  border-top: 2px solid #e1e1e1;
+  margin: 24px 0;
+}
+
+/* 换行 */
+.markdown-preview .md-br {
+  display: block;
+  margin: 12px 0;
+}
+
+/* 加粗和斜体 */
+.markdown-preview strong {
+  font-weight: 600;
+  color: #333;
+}
+
+.markdown-preview em {
+  font-style: italic;
+  color: #666;
+}
+
+/* 滚动条样式 */
+.markdown-preview::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.markdown-preview::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.markdown-preview::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.markdown-preview::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .markdown-preview {
+    padding: 16px;
+  }
+
+  .markdown-preview .md-h1 {
+    font-size: 24px;
+  }
+
+  .markdown-preview .md-h2 {
+    font-size: 20px;
+  }
+
+  .markdown-preview .md-h3 {
+    font-size: 18px;
+  }
+
+  .markdown-preview .md-p,
+  .markdown-preview .md-li {
+    font-size: 14px;
+  }
+
+  .markdown-preview .code-block {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

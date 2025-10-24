@@ -3,6 +3,7 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import APIConfig from './pages/APIConfig';
+import CozeAgent from './pages/CozeAgent';
 import HomePage from './pages/HomePage';
 import MyTemplate from './pages/MyTemplate';
 import TemplatePage from './pages/TemplatePage';
@@ -22,6 +23,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/template" element={<TemplatePage />} />
+            <Route path="/coze-agent" element={<CozeAgent />} />
             <Route path="/my-template" element={<MyTemplate />} />
             <Route path="/api-config" element={<APIConfig />} />
           </Routes>

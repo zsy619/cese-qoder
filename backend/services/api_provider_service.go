@@ -182,6 +182,11 @@ func DeleteAPIProvider(userMobile string, providerID uint) error {
 
 // GetDecryptedAPIKey 获取解密后的API Key（内部使用）
 func GetDecryptedAPIKey(provider *models.APIProvider) (string, error) {
+	// 如果API Key为空，直接返回空字符串
+	if provider.APIKey == "" {
+		return "", nil
+	}
+
 	encryptionKey, err := getOrCreateEncryptionKey()
 	if err != nil {
 		return "", err

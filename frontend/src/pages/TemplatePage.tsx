@@ -1,10 +1,11 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import Login from '../components/Login';
 import PreviewSection from '../components/PreviewSection';
 import SixElementCard from '../components/SixElementCard';
 import Toast, { ToastType } from '../components/Toast';
 import { TemplateService, UserService } from '../services';
 import '../styles/app.css';
+import { ElementType, generatePlaceholders, getPromptTemplate } from '../utils/promptTemplates';
 import { FieldName, TemplateData, validateTemplateData } from '../utils/validation';
 
 /**
@@ -91,6 +92,34 @@ const TemplatePage = () => {
    * 登录弹窗显示状态
    */
   const [showLogin, setShowLogin] = useState(false);
+
+  /**
+   * 提示词模板缓存
+   */
+  const [promptTemplates, setPromptTemplates] = useState<Record<ElementType, string>>({} as Record<ElementType, string>);
+
+  /**
+   * 加载提示词模板
+   */
+  useEffect(() => {
+    const loadTemplates = async () => {
+      const templates: Record<string, string> = {};
+      const elementTypes: ElementType[] = ['task', 'ai_role', 'my_role', 'key_info', 'behavior', 'delivery'];
+      
+      for (const type of elementTypes) {
+        try {
+          const template = await getPromptTemplate(type);
+          templates[type] = template;
+        } catch (error) {
+          console.error(`加载 ${type} 模板失败:`, error);
+        }
+      }
+      
+      setPromptTemplates(templates as Record<ElementType, string>);
+    };
+    
+    loadTemplates();
+  }, []);
 
   /**
    * 显示 Toast 提示
@@ -335,6 +364,10 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
             placeholder="[清晰描述你希望AI完成的具体任务]"
             isTextarea={true}
             error={errors.taskObjective}
+            promptTemplate={promptTemplates.task}
+            placeholders={generatePlaceholders('task', {
+              topic: templateData.topic,
+            })}
           />
           <SixElementCard
             title="AI的角色"
@@ -343,6 +376,11 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
             placeholder="[指定AI扮演的角色，如：专业文案、数据分析师、客服代表等]"
             isTextarea={true}
             error={errors.aiRole}
+            promptTemplate={promptTemplates.ai_role}
+            placeholders={generatePlaceholders('ai_role', {
+              topic: templateData.topic,
+              task: templateData.taskObjective,
+            })}
           />
           <SixElementCard
             title="我的角色"
@@ -351,6 +389,11 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
             placeholder="[说明你是谁，你在任务中的身份，如：产品经理、学习者、客户等]"
             isTextarea={true}
             error={errors.myRole}
+            promptTemplate={promptTemplates.my_role}
+            placeholders={generatePlaceholders('my_role', {
+              topic: templateData.topic,
+              task: templateData.taskObjective,
+            })}
           />
           <SixElementCard
             title="关键信息"
@@ -359,6 +402,12 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
             placeholder="[提供任务必需的背景信息、数据、参考资料或文件链接]"
             isTextarea={true}
             error={errors.keyInformation}
+            promptTemplate={promptTemplates.key_info}
+            placeholders={generatePlaceholders('key_info', {
+              topic: templateData.topic,
+              task: templateData.taskObjective,
+              ai_role: templateData.aiRole,
+            })}
           />
           <SixElementCard
             title="行为规则"
@@ -367,6 +416,13 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
             placeholder="[必须遵守的规则1]\n[必须遵守的规则2]\n[不可做的事情1]\n[不可做的事情2]"
             isTextarea={true}
             error={errors.behaviorRules}
+            promptTemplate={promptTemplates.behavior}
+            placeholders={generatePlaceholders('behavior', {
+              topic: templateData.topic,
+              task: templateData.taskObjective,
+              ai_role: templateData.aiRole,
+              key_info: templateData.keyInformation,
+            })}
           />
           <SixElementCard
             title="交付格式"
@@ -375,10 +431,18 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
             placeholder="[指定输出格式，如：Markdown表格、JSON、邮件正文、PPT大纲等]"
             isTextarea={true}
             error={errors.deliveryFormat}
+            promptTemplate={promptTemplates.delivery}
+            placeholders={generatePlaceholders('delivery', {
+              topic: templateData.topic,
+              task: templateData.taskObjective,
+              key_info: templateData.keyInformation,
+              behavior: templateData.behaviorRules,
+            })}
           />
         </div>
 
         <div className="template-actions">
+          {/* TODO: AI一键生成按钮待实现 */}
           <button className="btn btn-primary" onClick={handleGenerateTemplate}>
             生成模板
           </button>
