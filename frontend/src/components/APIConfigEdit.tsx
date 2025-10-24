@@ -18,24 +18,88 @@ interface APIConfigEditProps {
  */
 const COMMON_PROVIDERS = [
   {
-    name: 'OpenAI',
+    kind: 'OpenRouter',
+    name: 'OpenRouter',
+    api_url: 'https://openrouter.ai/api/v1',
+    models: ['openai/gpt-4', 'anthropic/claude-3-opus', 'google/gemini-pro'],
+  },
+  {
+    kind: 'Google Gemini',
+    name: 'Google Gemini',
+    api_url: 'https://generativelanguage.googleapis.com/v1beta',
+    models: ['gemini-pro', 'gemini-pro-vision', 'gemini-ultra'],
+  },
+  {
+    kind: 'OpenAI Compatible',
+    name: 'OpenAI Compatible',
     api_url: 'https://api.openai.com/v1',
     models: ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'gpt-4o'],
   },
   {
+    kind: 'Anthropic',
+    name: 'Anthropic Claude',
+    api_url: 'https://api.anthropic.com/v1',
+    models: ['claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku'],
+  },
+  {
+    kind: 'Amazon Bedrock',
+    name: 'Amazon Bedrock',
+    api_url: 'https://bedrock-runtime.us-east-1.amazonaws.com',
+    models: ['anthropic.claude-3', 'amazon.titan-text-express'],
+  },
+  {
+    kind: 'DeepSeek',
     name: 'DeepSeek',
     api_url: 'https://api.deepseek.com',
     models: ['deepseek-chat', 'deepseek-coder'],
   },
   {
+    kind: 'Ollama',
     name: 'Ollama',
     api_url: 'http://localhost:11434/v1',
     models: ['llama2', 'llama3', 'mistral', 'codellama', 'qwen'],
   },
   {
-    name: 'Custom',
-    api_url: '',
-    models: [],
+    kind: 'Claude Code',
+    name: 'Claude Code',
+    api_url: 'https://api.anthropic.com/v1',
+    models: ['claude-code'],
+  },
+  {
+    kind: '阿里千问',
+    name: '阿里千问',
+    api_url: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    models: ['qwen-turbo', 'qwen-plus', 'qwen-max'],
+  },
+  {
+    kind: '豆包',
+    name: '豆包',
+    api_url: 'https://ark.cn-beijing.volces.com/api/v3',
+    models: ['doubao-pro', 'doubao-lite'],
+  },
+  {
+    kind: '智普',
+    name: '智景 AI',
+    api_url: 'https://open.bigmodel.cn/api/paas/v4',
+    models: ['glm-4', 'glm-3-turbo'],
+  },
+  {
+    kind: '讯飞星火',
+    name: '讯飞星火',
+    api_url: 'https://spark-api.xf-yun.com/v1',
+    models: ['spark-3.5', 'spark-3.0', 'spark-2.0'],
+  },
+  {
+    kind: '百度千帆',
+    name: '百度千帆',
+    api_url: 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1',
+    models: ['ernie-4.0', 'ernie-3.5', 'ernie-turbo'],
+  },
+  {
+    kind: '腾讯混元',
+    name: '腾讯混元',
+    api_url: 'https://api.hunyuan.cloud.tencent.com/v1',
+    models: ['hunyuan-pro', 'hunyuan-standard', 'hunyuan-lite'],
   },
 ];
 
@@ -51,9 +115,10 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
   const isEditMode = !!provider;
 
   // 表单状态
-  const [selectedProvider, setSelectedProvider] = useState('Custom');
+  const [selectedKind, setSelectedKind] = useState('OpenAI Compatible');
   const [formData, setFormData] = useState<APIProviderData>({
     name: '',
+    api_kind: 'OpenAI Compatible',
     api_key: '',
     api_url: '',
     api_model: '',
@@ -75,6 +140,7 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
         // 编辑模式：填充现有数据
         setFormData({
           name: provider.name,
+          api_kind: provider.api_kind || 'OpenAI Compatible',
           api_key: '', // API Key不回显，需要重新输入
           api_url: provider.api_url,
           api_model: provider.api_model,
@@ -83,11 +149,8 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
           api_remark: provider.api_remark || '',
         });
         
-        // 尝试匹配预设Provider
-        const matchedProvider = COMMON_PROVIDERS.find(
-          p => p.api_url === provider.api_url || p.name === provider.name
-        );
-        setSelectedProvider(matchedProvider?.name || 'Custom');
+        // 设置模型类型
+        setSelectedKind(provider.api_kind || 'OpenAI Compatible');
       } else {
         // 新建模式：重置表单
         resetForm();
@@ -100,9 +163,10 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
    * 重置表单
    */
   const resetForm = () => {
-    setSelectedProvider('Custom');
+    setSelectedKind('OpenAI Compatible');
     setFormData({
       name: '',
+      api_kind: 'OpenAI Compatible',
       api_key: '',
       api_url: '',
       api_model: '',
@@ -114,17 +178,18 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
   };
 
   /**
-   * Provider类型选择变化
+   * 模型类型选择变化
    */
-  const handleProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const providerName = e.target.value;
-    setSelectedProvider(providerName);
+  const handleKindChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const kind = e.target.value;
+    setSelectedKind(kind);
 
-    const config = COMMON_PROVIDERS.find(p => p.name === providerName);
+    const config = COMMON_PROVIDERS.find(p => p.kind === kind);
     if (config) {
       setFormData(prev => ({
         ...prev,
-        name: config.name === 'Custom' ? prev.name : config.name,
+        api_kind: kind,
+        name: prev.name || config.name,
         api_url: config.api_url || prev.api_url,
       }));
     }
@@ -161,6 +226,10 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
 
     if (!formData.name?.trim()) {
       newErrors.name = 'Provider名称不能为空';
+    }
+
+    if (!formData.api_kind?.trim()) {
+      newErrors.api_kind = '模型类型不能为空';
     }
 
     // API密钥改为非必填，但新建模式下建议填写
@@ -201,6 +270,7 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
         // 编辑模式
         const updateData: APIProviderUpdateData = {
           name: formData.name,
+          api_kind: formData.api_kind,
           api_url: formData.api_url,
           api_model: formData.api_model,
           api_version: formData.api_version,
@@ -257,23 +327,24 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
         <form onSubmit={handleSubmit} className="login-form">
           {/* 两列布局容器 */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            {/* Provider类型选择 */}
+            {/* 模型类型选择 */}
             <div className="login-form-group" style={{ marginBottom: '0' }}>
-              <label htmlFor="provider-type" style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '14px', fontWeight: '500' }}>
+              <label htmlFor="api-kind" style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '14px', fontWeight: '500' }}>
                 <span style={{ marginRight: '6px' }}>🔌</span>
-                Provider类型
+                模型类型
               </label>
               <select
-                id="provider-type"
-                value={selectedProvider}
-                onChange={handleProviderChange}
+                id="api-kind"
+                name="api_kind"
+                value={selectedKind}
+                onChange={handleKindChange}
                 className="login-input"
                 style={{ paddingLeft: '16px' }}
                 disabled={loading}
               >
                 {COMMON_PROVIDERS.map((p) => (
-                  <option key={p.name} value={p.name}>
-                    {p.name}
+                  <option key={p.kind} value={p.kind}>
+                    {p.kind}
                   </option>
                 ))}
               </select>
@@ -372,7 +443,7 @@ const APIConfigEdit: React.FC<APIConfigEditProps> = ({
                   list="model-suggestions"
                 />
                 <datalist id="model-suggestions">
-                  {COMMON_PROVIDERS.find(p => p.name === selectedProvider)?.models.map((model) => (
+                  {COMMON_PROVIDERS.find(p => p.kind === selectedKind)?.models.map((model) => (
                     <option key={model} value={model} />
                   ))}
                 </datalist>

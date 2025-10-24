@@ -60,6 +60,7 @@ CREATE TABLE `cese_api_provider` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Provider ID',
   `mobile` VARCHAR(32) NOT NULL COMMENT '用户手机号',
   `name` VARCHAR(100) NOT NULL COMMENT 'Provider名称',
+  `api_kind` VARCHAR(50) NOT NULL DEFAULT 'OpenAI Compatible' COMMENT '模型类型',
   `api_key` VARCHAR(255) NULL COMMENT 'API密钥（可选）',
   `api_url` VARCHAR(500) NOT NULL COMMENT 'API访问地址',
   `api_model` VARCHAR(100) NOT NULL COMMENT '使用的模型名称',
@@ -72,6 +73,7 @@ CREATE TABLE `cese_api_provider` (
   INDEX `idx_mobile` (`mobile`),
   INDEX `idx_status` (`api_status`),
   INDEX `idx_api_open` (`api_open`),
+  INDEX `idx_api_kind` (`api_kind`),
   CONSTRAINT `fk_provider_user` FOREIGN KEY (`mobile`) REFERENCES `cese_user`(`mobile`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API Provider配置表';
 
@@ -89,10 +91,12 @@ INSERT INTO `cese_template` (`mobile`, `topic`, `task_objective`, `ai_role`, `my
 ('13800138000', '代码审查助手', '协助进行代码质量审查和优化建议', '高级软件工程师', '开发人员', '代码片段、项目技术栈、代码规范', '遵循最佳实践、提供具体改进建议', '结构化文本报告');
 
 -- 插入示例API Provider配置
-INSERT INTO `cese_api_provider` (`mobile`, `name`, `api_key`, `api_url`, `api_model`, `api_open`, `api_remark`) VALUES
-('13800138000', 'DeepSeek', 'sk-your-deepseek-key', 'https://api.deepseek.com', 'deepseek-chat', 0, 'DeepSeek官方API-私有'),
-('13800138000', 'Ollama本地', 'local', 'http://localhost:11434', 'llama2', 1, 'Ollama本地部署-公开'),
-('13900139000', 'OpenAI', 'sk-your-openai-key', 'https://api.openai.com', 'gpt-4', 0, 'OpenAI官方API-私有');
+INSERT INTO `cese_api_provider` (`mobile`, `name`, `api_kind`, `api_key`, `api_url`, `api_model`, `api_open`, `api_remark`) VALUES
+('13800138000', 'DeepSeek官方', 'DeepSeek', 'sk-your-deepseek-key', 'https://api.deepseek.com', 'deepseek-chat', 0, 'DeepSeek官方API-私有'),
+('13800138000', 'Ollama本地', 'Ollama', 'local', 'http://localhost:11434/v1', 'llama2', 1, 'Ollama本地部署-公开'),
+('13900139000', 'OpenAI官方', 'OpenAI Compatible', 'sk-your-openai-key', 'https://api.openai.com/v1', 'gpt-4', 0, 'OpenAI官方API-私有'),
+('13800138000', '阿里千问', '阿里千问', 'sk-qwen-key', 'https://dashscope.aliyuncs.com/compatible-mode/v1', 'qwen-turbo', 1, '阿里通义千问API-公开'),
+('13800138000', '豆包测试', '豆包', 'sk-doubao-key', 'https://ark.cn-beijing.volces.com/api/v3', 'doubao-pro', 0, '字节豆包API-私有');
 
 -- ============================================
 -- 完成

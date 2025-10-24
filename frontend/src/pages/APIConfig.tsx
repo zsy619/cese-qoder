@@ -437,6 +437,7 @@ const APIConfig: React.FC = () => {
                     />
                   </th>
                   <th>名称</th>
+                  <th>模型类型</th>
                   <th>API 地址</th>
                   <th>模型</th>
                   <th>版本</th>
@@ -467,6 +468,17 @@ const APIConfig: React.FC = () => {
                           {provider.api_remark}
                         </div>
                       )}
+                    </td>
+                    <td>
+                      <span className="kind-badge" style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        background: '#f0f0f0', 
+                        fontSize: '12px',
+                        fontWeight: '500'
+                      }}>
+                        {provider.api_kind}
+                      </span>
                     </td>
                     <td>
                       <div className="provider-url" title={provider.api_url}>

@@ -231,13 +231,13 @@ const MyTemplate: React.FC = () => {
                       >
                         📋 JSON
                       </button>
-                      <button
+                      {/* <button
                         className="action-btn export-btn"
                         onClick={() => handleExport(template, 'txt')}
                         title="导出为TXT"
                       >
                         📃 TXT
-                      </button>
+                      </button> */}
                       <button
                         className="action-btn delete-btn"
                         onClick={() => handleDelete(template.id, template.topic)}

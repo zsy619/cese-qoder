@@ -9,6 +9,7 @@ type APIProvider struct {
 	ID         uint      `json:"id" gorm:"primaryKey;autoIncrement"`
 	Mobile     string    `json:"mobile" gorm:"type:varchar(32);not null;index"`
 	Name       string    `json:"name" gorm:"type:varchar(100);not null"`
+	APIKind    string    `json:"api_kind" gorm:"type:varchar(50);not null;default:'OpenAI Compatible';index"`
 	APIKey     string    `json:"api_key" gorm:"type:varchar(255)"` // 改为可选，移除 not null
 	APIURL     string    `json:"api_url" gorm:"type:varchar(500);not null"`
 	APIModel   string    `json:"api_model" gorm:"type:varchar(100);not null"`
@@ -28,6 +29,7 @@ func (APIProvider) TableName() string {
 // APIProviderCreateRequest 创建API Provider请求
 type APIProviderCreateRequest struct {
 	Name       string `json:"name" binding:"required"`
+	APIKind    string `json:"api_kind" binding:"required"`
 	APIKey     string `json:"api_key"` // 移除 required，改为可选
 	APIURL     string `json:"api_url" binding:"required"`
 	APIModel   string `json:"api_model" binding:"required"`
@@ -39,6 +41,7 @@ type APIProviderCreateRequest struct {
 // APIProviderUpdateRequest 更新API Provider请求
 type APIProviderUpdateRequest struct {
 	Name       string `json:"name"`
+	APIKind    string `json:"api_kind"`
 	APIKey     string `json:"api_key"`
 	APIURL     string `json:"api_url"`
 	APIModel   string `json:"api_model"`
@@ -53,6 +56,7 @@ type APIProviderResponse struct {
 	ID         uint      `json:"id"`
 	Mobile     string    `json:"mobile"`
 	Name       string    `json:"name"`
+	APIKind    string    `json:"api_kind"`
 	APIKeyMask string    `json:"api_key_mask"` // 脱敏后的密钥
 	APIURL     string    `json:"api_url"`
 	APIModel   string    `json:"api_model"`
@@ -70,6 +74,7 @@ func (p *APIProvider) ToResponse() *APIProviderResponse {
 		ID:         p.ID,
 		Mobile:     p.Mobile,
 		Name:       p.Name,
+		APIKind:    p.APIKind,
 		APIKeyMask: maskAPIKey(p.APIKey),
 		APIURL:     p.APIURL,
 		APIModel:   p.APIModel,

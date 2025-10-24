@@ -25,6 +25,11 @@ func CreateAPIProviderHandler(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	if !utils.ValidateRequired(req.APIKind) {
+		utils.ResponseError(&ctx, c, utils.CodeInvalidParams, "模型类型不能为空")
+		return
+	}
+
 	// API Key 改为可选，不需要验证
 
 	if !utils.ValidateRequired(req.APIURL) {

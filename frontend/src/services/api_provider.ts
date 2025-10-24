@@ -11,6 +11,8 @@ import HttpClient from './auth';
 export interface APIProviderData {
   /** Provider名称 */
   name: string;
+  /** 模型类型 */
+  api_kind: string;
   /** API密钥 */
   api_key: string;
   /** API访问地址 */
@@ -35,6 +37,8 @@ export interface APIProvider {
   mobile: string;
   /** Provider名称 */
   name: string;
+  /** 模型类型 */
+  api_kind: string;
   /** API密钥（脱敏显示） */
   api_key_mask: string;
   /** API访问地址 */
@@ -61,6 +65,8 @@ export interface APIProvider {
 export interface APIProviderUpdateData {
   /** Provider名称 */
   name?: string;
+  /** 模型类型 */
+  api_kind?: string;
   /** API密钥 */
   api_key?: string;
   /** API访问地址 */

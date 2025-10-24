@@ -42,6 +42,7 @@ func TestCreateAPIProvider(t *testing.T) {
 	// 测试创建API Provider
 	req := &models.APIProviderCreateRequest{
 		Name:      "DeepSeek Test",
+		APIKind:   "DeepSeek",
 		APIKey:    "sk-test-key-123456",
 		APIURL:    "https://api.deepseek.com",
 		APIModel:  "deepseek-chat",
@@ -86,12 +87,14 @@ func TestListAPIProviders(t *testing.T) {
 	providers := []models.APIProviderCreateRequest{
 		{
 			Name:     "Provider 1",
+			APIKind:  "OpenAI Compatible",
 			APIKey:   "key1",
 			APIURL:   "https://api1.com",
 			APIModel: "gpt-4",
 		},
 		{
 			Name:     "Provider 2",
+			APIKind:  "DeepSeek",
 			APIKey:   "key2",
 			APIURL:   "https://api2.com",
 			APIModel: "deepseek-chat",
@@ -145,6 +148,7 @@ func TestUpdateAPIProvider(t *testing.T) {
 	// 创建Provider
 	createReq := &models.APIProviderCreateRequest{
 		Name:     "Original Name",
+		APIKind:  "OpenAI Compatible",
 		APIKey:   "original-key",
 		APIURL:   "https://original.com",
 		APIModel: "gpt-3.5",
@@ -159,6 +163,7 @@ func TestUpdateAPIProvider(t *testing.T) {
 	// 测试更新
 	updateReq := &models.APIProviderUpdateRequest{
 		Name:     "Updated Name",
+		APIKind:  "DeepSeek",
 		APIModel: "gpt-4",
 	}
 
@@ -179,6 +184,10 @@ func TestUpdateAPIProvider(t *testing.T) {
 
 	if updated.APIModel != updateReq.APIModel {
 		t.Errorf("UpdateAPIProvider() APIModel = %v, want %v", updated.APIModel, updateReq.APIModel)
+	}
+
+	if updated.APIKind != updateReq.APIKind {
+		t.Errorf("UpdateAPIProvider() APIKind = %v, want %v", updated.APIKind, updateReq.APIKind)
 	}
 }
 
@@ -202,6 +211,7 @@ func TestDeleteAPIProvider(t *testing.T) {
 	// 创建Provider
 	createReq := &models.APIProviderCreateRequest{
 		Name:     "To Delete",
+		APIKind:  "Ollama",
 		APIKey:   "delete-key",
 		APIURL:   "https://delete.com",
 		APIModel: "gpt-3.5",
@@ -249,6 +259,7 @@ func TestEncryptionDecryption(t *testing.T) {
 
 	createReq := &models.APIProviderCreateRequest{
 		Name:     "Encryption Test",
+		APIKind:  "OpenAI Compatible",
 		APIKey:   originalAPIKey,
 		APIURL:   "https://api.test.com",
 		APIModel: "gpt-4",

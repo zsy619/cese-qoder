@@ -30,6 +30,7 @@ func CreateAPIProvider(userMobile string, req *models.APIProviderCreateRequest) 
 	provider := &models.APIProvider{
 		Mobile:     userMobile,
 		Name:       req.Name,
+		APIKind:    req.APIKind,
 		APIKey:     encryptedKey,
 		APIURL:     req.APIURL,
 		APIModel:   req.APIModel,
@@ -122,6 +123,10 @@ func UpdateAPIProvider(userMobile string, providerID uint, req *models.APIProvid
 
 	if req.Name != "" {
 		updates["name"] = req.Name
+	}
+
+	if req.APIKind != "" {
+		updates["api_kind"] = req.APIKind
 	}
 
 	if req.APIKey != "" {
