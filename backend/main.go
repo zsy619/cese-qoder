@@ -49,9 +49,11 @@ func main() {
 
 	// 4. 初始化数据库连接
 	if err := config.InitDB(&appConfig.DB); err != nil {
-		utils.Fatal("Failed to connect to database", zap.Error(err))
+		utils.Warn("Failed to connect to database, running in development mode without database", zap.Error(err))
+		// 即使数据库连接失败，也继续启动服务器以提供静态文件服务
+	} else {
+		utils.Info("Database connected successfully")
 	}
-	utils.Info("Database connected successfully")
 
 	// 5. 创建 Hertz 服务器实例
 	h := server.Default(

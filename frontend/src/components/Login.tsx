@@ -19,8 +19,8 @@ interface LoginProps {
  * @description 提供用户登录功能，支持手机号+密码登录
  */
 const Login: React.FC<LoginProps> = ({ visible, onClose, onSuccess }) => {
-  const [mobile, setMobile] = useState('');
-  const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('13800138000');
+  const [password, setPassword] = useState('Test@123456');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     mobile?: string;

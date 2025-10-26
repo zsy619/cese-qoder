@@ -9,8 +9,13 @@ bin
 *.swp
 *.swo
 *~
+*.example
 
 # OS
 .DS_Store
 Thumbs.db
 backend/qoder-api
+backend/main
+backend/main_sece
+
+frontend/build

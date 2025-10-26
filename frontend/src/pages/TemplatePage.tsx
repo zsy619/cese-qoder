@@ -1,11 +1,12 @@
 import { useEffect, useReducer, useState } from 'react';
+import BatchAIGenerating from '../components/BatchAIGenerating';
 import Login from '../components/Login';
 import PreviewSection from '../components/PreviewSection';
 import SixElementCard from '../components/SixElementCard';
 import Toast, { ToastType } from '../components/Toast';
 import { TemplateService, UserService } from '../services';
 import '../styles/app.css';
-import { ElementType, generatePlaceholders, getPromptTemplate } from '../utils/promptTemplates';
+import { clearTemplateCache, ElementType, generatePlaceholders, getPromptTemplate } from '../utils/promptTemplates';
 import { FieldName, TemplateData, validateTemplateData } from '../utils/validation';
 
 /**
@@ -94,6 +95,11 @@ const TemplatePage = () => {
   const [showLogin, setShowLogin] = useState(false);
 
   /**
+   * 批量生成弹窗显示状态
+   */
+  const [showBatchGenerate, setShowBatchGenerate] = useState(false);
+
+  /**
    * 提示词模板缓存
    */
   const [promptTemplates, setPromptTemplates] = useState<Record<ElementType, string>>({} as Record<ElementType, string>);
@@ -102,6 +108,9 @@ const TemplatePage = () => {
    * 加载提示词模板
    */
   useEffect(() => {
+    // 清除模板缓存以确保重新加载
+    clearTemplateCache();
+    
     const loadTemplates = async () => {
       const templates: Record<string, string> = {};
       const elementTypes: ElementType[] = ['task', 'ai_role', 'my_role', 'key_info', 'behavior', 'delivery'];
@@ -109,12 +118,15 @@ const TemplatePage = () => {
       for (const type of elementTypes) {
         try {
           const template = await getPromptTemplate(type);
+          console.log(`Loaded template for ${type}:`, template);
           templates[type] = template;
+          console.log(`Loaded template for ${type}:`, template ? 'SUCCESS' : 'EMPTY');
         } catch (error) {
           console.error(`加载 ${type} 模板失败:`, error);
         }
       }
       
+      console.log('All templates loaded:', templates);
       setPromptTemplates(templates as Record<ElementType, string>);
     };
     
@@ -322,6 +334,37 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
     showToast('登录成功！', 'success');
   };
 
+  /**
+   * 处理批量生成按钮点击
+   */
+  const handleBatchGenerate = () => {
+    // 验证主题是否为空
+    if (!templateData.topic || templateData.topic.trim() === '') {
+      showToast('请先输入主题后再使用批量生成功能', 'warning');
+      return;
+    }
+
+    setShowBatchGenerate(true);
+  };
+
+  /**
+   * 批量生成成功的回调
+   */
+  const handleBatchGenerateSuccess = (results: Record<string, string>) => {
+    // 将生成的结果填充到表单中
+    const updates: Partial<TemplateData> = {};
+    
+    if (results.task) updates.taskObjective = results.task;
+    if (results.ai_role) updates.aiRole = results.ai_role;
+    if (results.my_role) updates.myRole = results.my_role;
+    if (results.key_info) updates.keyInformation = results.key_info;
+    if (results.behavior) updates.behaviorRules = results.behavior;
+    if (results.delivery) updates.deliveryFormat = results.delivery;
+
+    dispatch({ type: 'SET_DATA', data: updates });
+    showToast('批量生成完成！', 'success');
+  };
+
   return (
     <>
       {/* Toast 提示 */}
@@ -339,6 +382,14 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
         visible={showLogin}
         onClose={() => setShowLogin(false)}
         onSuccess={handleLoginSuccess}
+      />
+
+      {/* 批量生成弹窗 */}
+      <BatchAIGenerating
+        visible={showBatchGenerate}
+        onClose={() => setShowBatchGenerate(false)}
+        topic={templateData.topic}
+        onSuccess={handleBatchGenerateSuccess}
       />
 
       <div className="container">
@@ -442,7 +493,9 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
         </div>
 
         <div className="template-actions">
-          {/* TODO: AI一键生成按钮待实现 */}
+          <button className="btn btn-primary" onClick={handleBatchGenerate}>
+            🤖 AI批量生成
+          </button>
           <button className="btn btn-primary" onClick={handleGenerateTemplate}>
             生成模板
           </button>
@@ -455,12 +508,6 @@ ${templateData.deliveryFormat || '[指定输出格式，如：Markdown表格、J
           <button className="btn btn-secondary" onClick={handleCopyAsJSON}>
             拷贝JSON
           </button>
-          {/* <button className="btn btn-secondary" onClick={() => handleExportTemplate('markdown')}>
-            导出Markdown
-          </button>
-          <button className="btn btn-secondary" onClick={() => handleExportTemplate('json')}>
-            导出JSON
-          </button> */}
         </div>
       </div>
 

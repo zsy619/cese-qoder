@@ -121,11 +121,12 @@ func UpdateAPIProvider(userMobile string, providerID uint, req *models.APIProvid
 	db := config.GetDB()
 	updates := make(map[string]interface{})
 
-	if req.Name != "" {
+	// 检查每个字段是否需要更新
+	if req.Name != "" && req.Name != provider.Name {
 		updates["name"] = req.Name
 	}
 
-	if req.APIKind != "" {
+	if req.APIKind != "" && req.APIKind != provider.APIKind {
 		updates["api_kind"] = req.APIKind
 	}
 
@@ -142,28 +143,33 @@ func UpdateAPIProvider(userMobile string, providerID uint, req *models.APIProvid
 		updates["api_key"] = encryptedKey
 	}
 
-	if req.APIModel != "" {
+	if req.APIURL != "" && req.APIURL != provider.APIURL {
+		updates["api_url"] = req.APIURL
+	}
+
+	if req.APIModel != "" && req.APIModel != provider.APIModel {
 		updates["api_model"] = req.APIModel
 	}
 
-	if req.APIVersion != "" {
+	if req.APIVersion != "" && req.APIVersion != provider.APIVersion {
 		updates["api_version"] = req.APIVersion
 	}
 
-	if req.APIStatus != nil {
+	if req.APIStatus != nil && *req.APIStatus != provider.APIStatus {
 		updates["api_status"] = *req.APIStatus
 	}
 
-	if req.APIOpen != nil {
+	if req.APIOpen != nil && *req.APIOpen != provider.APIOpen {
 		updates["api_open"] = *req.APIOpen
 	}
 
-	if req.APIRemark != "" {
+	if req.APIRemark != "" && req.APIRemark != provider.APIRemark {
 		updates["api_remark"] = req.APIRemark
 	}
 
+	// 如果没有需要更新的字段，直接返回成功而不是错误
 	if len(updates) == 0 {
-		return errors.New("no fields to update")
+		return nil
 	}
 
 	return db.Model(provider).Updates(updates).Error

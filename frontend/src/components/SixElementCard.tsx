@@ -101,17 +101,31 @@ const SixElementCard: React.FC<SixElementCardProps> = ({
 
   // 处理AI生成按钮点击
   const handleAIGenerate = () => {
-    // 如果没有提供提示词模板，不显示AI生成
-    if (!promptTemplate) {
-      return;
-    }
-    
-    // 验证主题是否为空
+    // 1. 判断主题是否为空
     if (!placeholders?.topic || placeholders.topic.trim() === '') {
       setToast({ message: '请先输入主题后再使用AI生成功能', type: 'warning' });
       return;
     }
     
+    console.log('AI Generate button clicked with:', {
+      title,
+      promptTemplate: promptTemplate ? promptTemplate.substring(0, 100) + '...' : 'EMPTY',
+      placeholders
+    });
+    
+    // 2. 验证提示词模板是否存在
+    if (!promptTemplate) {
+      setToast({ message: '提示词模板未加载，请稍后重试', type: 'error' });
+      return;
+    }
+    
+    // 3. 验证提示词模板是否为HTML内容
+    if (promptTemplate.trim().startsWith('<!DOCTYPE html') || promptTemplate.trim().startsWith('<html')) {
+      setToast({ message: '提示词模板加载错误，请刷新页面重试', type: 'error' });
+      return;
+    }
+    
+    // 4. 显示AI生成组件
     setShowAICreating(true);
   };
 
